@@ -15,9 +15,9 @@ Speed 2048 reimagines the popular 2048 game with added speed and strategy elemen
 - **Performance Tracking:** Monitor your progress with in-game stats and timing metrics.
 
 ## Screenshots
-<img src="https://github.com/user-attachments/assets/56e35770-5d83-4bee-9e1c-a0c5436ca77f" alt="Speed 2048 Logo" width="200">
-<img src="https://github.com/user-attachments/assets/b58709af-defe-4e58-89c7-315bcadeee85" alt="Speed 2048 Logo" width="200">
-<img src="https://github.com/user-attachments/assets/28892e8e-2787-4afe-b0c0-7e151333ece7" alt="Speed 2048 Logo" width="200">
+<img src="https://github.com/user-attachments/assets/56e35770-5d83-4bee-9e1c-a0c5436ca77f" alt="Speed 2048 Logo" width="250">
+<img src="https://github.com/user-attachments/assets/b58709af-defe-4e58-89c7-315bcadeee85" alt="Speed 2048 Logo" width="250">
+<img src="https://github.com/user-attachments/assets/28892e8e-2787-4afe-b0c0-7e151333ece7" alt="Speed 2048 Logo" width="250">
 
 ## Getting Started
 
