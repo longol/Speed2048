@@ -16,6 +16,8 @@ struct SettingsView: View {
             timesToBeat
             
             Spacer()
+            
+            contactView
         }
         .padding()
     }
@@ -34,7 +36,19 @@ struct SettingsView: View {
                     .foregroundColor(.black)
             }
         }
+    }
+    
+    @ViewBuilder private var contactView: some View {
+        HStack {
+            Text("Send us your feedback!")
+            Link("Visit site", destination: URL(string: "https://lucaslongo.com/speed2048/")!)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(5)
 
+        }
     }
     
     @ViewBuilder private var gameLevelPicker: some View {

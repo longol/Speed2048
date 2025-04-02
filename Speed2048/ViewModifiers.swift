@@ -1,8 +1,8 @@
 //
 //  ViewModifiers.swift
-//  TwentyFortyEight
+//  Speed2048
 //
-//  Created by Lucas Longo on 2/17/25.
+//  Created by Lucas Longo on 4/2/25.
 //
 
 import SwiftUI
@@ -18,6 +18,7 @@ struct GameButtonModifier: ViewModifier {
             .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 4)
             .foregroundColor(.white)
+            .buttonStyle(BorderlessButtonStyle())
     }
 }
 
