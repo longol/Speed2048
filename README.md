@@ -49,7 +49,8 @@ Speed 2048 reimagines the popular 2048 game with added speed and strategy elemen
 
 ## Donations
 If you enjoy playing Speed 2048 and appreciate the effort that went into its development, please consider supporting the project with a donation.
-Donate Now
+
+[**Donate Now**](https://www.paypal.com/donate/?business=7L6CKKDNMKJJ2&no_recurring=0&item_name=Support+development+and+improvements+of+Speed2048&currency_code=USD)
 
 ## Privacy Policy
 Speed 2048 is committed to protecting your privacy. Please review our [Privacy Policy](https://lucaslongo.com/speed2048-privacy-policy/) for details on how your data is handled.
