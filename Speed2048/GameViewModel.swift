@@ -57,6 +57,42 @@ class GameViewModel: ObservableObject {
         startTimer() // Start the timer only after the game is initialized
     }
     
+    // Start a new game with the perfect board setup.
+    func newPerfectGame() {
+        stopTimer()
+        
+        // Clear previous game state
+        tiles = []
+        undoStack = []
+        seconds = 0
+//        cheatsUsed = 0
+//        undosUsed = 0
+//        manual4sUsed = 0
+        tileDurations = [:]
+        lastTileTimestamps = [:]
+        
+        // Define perfect board tile values
+        let perfectBoardValues: [[Int]] = [
+            [131072, 65536, 32768, 16384],
+            [8192, 4096, 2048, 1024],
+            [512, 256, 128, 64],
+            [32, 16, 8, 4]
+        ]
+        
+        // Populate tiles with the perfect board setup
+        for row in 0..<boardSize {
+            for col in 0..<boardSize {
+                let value = perfectBoardValues[row][col]
+                let tile = Tile(id: UUID(), value: value, row: row, col: col)
+                tiles.append(tile)
+            }
+        }
+
+        // Start timer if you still want to track time after setup
+        startTimer()
+    }
+
+    
     func startTimer() {
         guard timer == nil else { return } // Ensure the timer is not already running
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in

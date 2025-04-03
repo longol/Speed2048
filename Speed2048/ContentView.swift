@@ -16,35 +16,11 @@ struct ContentView: View {
     let boardDimension: CGFloat = 4
     let cellSize: CGFloat = 80
     
-    var body: some View {
-        VStack(alignment: .center) {
-#if os(iOS)
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                GeometryReader { geometry in
-                    if geometry.size.width > geometry.size.height {
-                        landscapeMode
-                    } else {
-                        portraitMode
-                    }
-                }
-            } else {
-                portraitMode
-            }
-#else
-            portraitMode
-#endif
-        }
-        // Set an overall minimum window size for macOS.
-#if os(macOS)
-        .frame(minWidth: 400, minHeight: 500)
-#endif
-        .dynamicTypeSize(.xSmall ... .xxxLarge)
-        .sheet(isPresented: $showSettings) {
-            SettingsView(gameModel: gameModel)
-        }
+    var lastTwoTiles : [Int] {
+        Array(gameModel.tileDurations.keys.sorted().suffix(2))
     }
     
-    @ViewBuilder private var portraitMode: some View {
+    var body: some View {
         VStack(alignment: .center, spacing: 0) {
             headerView
             
@@ -55,29 +31,15 @@ struct ContentView: View {
             gameBoard
             
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    
-    @ViewBuilder private var landscapeMode: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
-                
-                headerView
-                
-                Spacer()
-                
-                controlButtons
-            }
-            .padding()
-            
-            Spacer()
-            
-            gameBoard
-            
+        #if os(macOS)
+        .frame(minWidth: 400, minHeight: 500)
+        #endif
+        .dynamicTypeSize(.xSmall ... .xxxLarge)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(gameModel: gameModel)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
+        
     @ViewBuilder private var headerView: some View {
         VStack(alignment: .center) {
             HStack {
@@ -94,10 +56,57 @@ struct ContentView: View {
 
             Text("Elapsed time: \(gameModel.seconds.formattedAsTime)")
 
+//            newPerfectGameButton
+
         }
         .padding()
     }
+   
+    @ViewBuilder private var timesToBeat: some View {
+        
+        let columns = [
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center)
+        ]
+        
+        LazyVGrid(columns: columns, spacing: 10) {
+            // Table headers
+            Label("Number", systemImage: "number")
+            Label("Beat", systemImage: "trophy")
+            Label("Current", systemImage: "figure.run")
+            
+            if lastTwoTiles.count >= 2 {
+                ForEach(lastTwoTiles.sorted(by: >), id: \.self) { tile in
+                    gridRow(for: tile, useData: true)
+                }
+            } else if lastTwoTiles.count == 1 {
+                // First row: static values for tile 16
+                gridRow(for: 16, useData: false)
+                // Second row: dynamic values for tile 8
+                gridRow(for: 8, useData: true)
+            } else {
+                // Both rows: static values when no data is available
+                gridRow(for: 16, useData: false)
+                gridRow(for: 8, useData: false)
+            }
+        }
+        .padding()
+        .font(.system(size: 18, weight: .medium))
+        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
+        .lineLimit(1)             // keep it on one line
+
+    }
     
+    @ViewBuilder private var controlButtons: some View {
+        HStack(spacing: 10) {
+            undoButton
+            addFourButton
+            newButton
+        }
+        .padding()
+    }
+
     @ViewBuilder private var gameBoard: some View {
         GeometryReader { geo in
             let side = geo.size.width
@@ -148,46 +157,7 @@ struct ContentView: View {
         .padding()
         .layoutPriority(1)  // ensure the game board isn't squeezed by other views
     }
-    
-    var lastTwoTiles : [Int] {
-        Array(gameModel.tileDurations.keys.sorted().suffix(2))
-    }
 
-    @ViewBuilder private var timesToBeat: some View {
-        
-        let columns = [
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center)
-        ]
-        
-        LazyVGrid(columns: columns, spacing: 10) {
-            // Table headers
-            Label("Number", systemImage: "number")
-            Label("Beat", systemImage: "trophy")
-            Label("Current", systemImage: "figure.run")
-            
-            if lastTwoTiles.count >= 2 {
-                ForEach(lastTwoTiles.sorted(by: >), id: \.self) { tile in
-                    gridRow(for: tile, useData: true)
-                }
-            } else if lastTwoTiles.count == 1 {
-                // First row: static values for tile 16
-                gridRow(for: 16, useData: false)
-                // Second row: dynamic values for tile 8
-                gridRow(for: 8, useData: true)
-            } else {
-                // Both rows: static values when no data is available
-                gridRow(for: 16, useData: false)
-                gridRow(for: 8, useData: false)
-            }
-        }
-        .padding()
-        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
-        .lineLimit(1)             // keep it on one line
-
-    }
-    
     func fgColor(tile: Int) -> Color {
         if let curr = gameModel.secondsSinceLast(for: tile), let avg = gameModel.averageTime(for: tile) {
             return Double(curr) > avg ? .red : .green
@@ -213,29 +183,6 @@ struct ContentView: View {
             .foregroundColor(fgColor(tile: tile))
         }
 
-    }
-
-    @ViewBuilder private var gameLevelPicker: some View {
-        VStack(alignment: .center) {
-            
-            Text("Game Level").bold()
-            Picker("", selection: $gameModel.gameLevel) {
-                ForEach(GameLevel.allCases, id: \.self) { level in
-                    Text(level.rawValue).tag(level)
-                }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-        }
-        .padding()
-    }
-    
-    @ViewBuilder private var controlButtons: some View {
-        HStack(spacing: 10) {
-            undoButton
-            addFourButton
-            newButton
-        }
-        .padding()
     }
     
     @ViewBuilder private var settingsButton: some View {
@@ -265,6 +212,12 @@ struct ContentView: View {
         }
     }
     
+    @ViewBuilder private var newPerfectGameButton: some View {
+        Button("Perfect") {
+            gameModel.newPerfectGame()
+        }
+    }
+    
     @ViewBuilder private var undoButton: some View {
         Button(action: { gameModel.undo() }) {
             Text("Undo")
@@ -285,62 +238,3 @@ struct ContentView: View {
 
 }
 
-// MARK: - macOS Keyboard Handling
-
-#if os(macOS)
-/// A view that captures key events on macOS.
-struct KeyEventHandlingView: NSViewRepresentable {
-    var keyDownHandler: (Key) -> Void
-
-    func makeNSView(context: Context) -> NSView {
-        let view = KeyView()
-        view.keyDownHandler = keyDownHandler
-        return view
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {}
-
-    class KeyView: NSView {
-        var keyDownHandler: ((Key) -> Void)?
-
-        override var acceptsFirstResponder: Bool { true }
-
-        override func keyDown(with event: NSEvent) {
-            // Arrow key keyCodes: left=123, right=124, down=125, up=126.
-            switch event.keyCode {
-            case 123:
-                keyDownHandler?(.left)
-            case 124:
-                keyDownHandler?(.right)
-            case 125:
-                keyDownHandler?(.down)
-            case 126:
-                keyDownHandler?(.up)
-            default:
-                break
-            }
-        }
-        
-        override func viewDidMoveToWindow() {
-            window?.makeFirstResponder(self)
-        }
-    }
-}
-
-/// Simple key identifiers.
-enum Key {
-    case left, right, up, down
-}
-#else
-// For non-macOS platforms, just provide an empty view.
-struct KeyEventHandlingView: View {
-    var keyDownHandler: (Key) -> Void
-    var body: some View { EmptyView() }
-}
-enum Key { case left, right, up, down }
-#endif
-
-
-//#Preview {
-//    ContentView()
-//}
