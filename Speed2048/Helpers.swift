@@ -31,6 +31,9 @@ struct GameState: Codable {
     let boardSize: Int
     let tileDurations: [Int: [Int]]
     let lastTileTimestamps: [Int: Int]
+    let cheatsUsed: Int
+    let undosUsed: Int
+    let manual4sUsed: Int
 }
 
 struct TimingInfo: Codable {

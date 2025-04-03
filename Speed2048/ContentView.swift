@@ -24,11 +24,11 @@ struct ContentView: View {
         VStack(alignment: .center, spacing: 0) {
             headerView
             
-            controlButtons
+            controlButtonsView
             
             Spacer()
             
-            gameBoard
+            gameBoardView
             
         }
         #if os(macOS)
@@ -43,7 +43,7 @@ struct ContentView: View {
     @ViewBuilder private var headerView: some View {
         VStack(alignment: .center) {
             HStack {
-                Text("Speed 2048")
+                Text("131072 Quest")
                     .font(.largeTitle)
                     .bold()
                 
@@ -52,43 +52,61 @@ struct ContentView: View {
                 settingsButton
             }
                         
-            timesToBeat
+            scoresView
 
-            Text("Elapsed time: \(gameModel.seconds.formattedAsTime)")
-
-//            newPerfectGameButton
 
         }
         .padding()
     }
    
-    @ViewBuilder private var timesToBeat: some View {
+    @ViewBuilder private var scoresView: some View {
         
-        let columns = [
+        let columnsScores = [
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center)
+        ]
+        let columnsTimesToBeat = [
             GridItem(.flexible(), alignment: .center),
             GridItem(.flexible(), alignment: .center),
             GridItem(.flexible(), alignment: .center)
         ]
         
-        LazyVGrid(columns: columns, spacing: 10) {
-            // Table headers
-            Label("Number", systemImage: "number")
-            Label("Beat", systemImage: "trophy")
-            Label("Current", systemImage: "figure.run")
-            
-            if lastTwoTiles.count >= 2 {
-                ForEach(lastTwoTiles.sorted(by: >), id: \.self) { tile in
-                    gridRow(for: tile, useData: true)
+        VStack {
+
+            LazyVGrid(columns: columnsScores, spacing: 10) {
+                Image(systemName: "clock")
+                Image(systemName: "sum")
+                Image(systemName: "flag.pattern.checkered")
+                Image(systemName: "circle.grid.cross.up.filled")
+
+                Text("\(gameModel.seconds.formattedAsTime)")
+                Text("\(gameModel.totalScore)")
+                Text("\(gameModel.tiles.map { $0.value }.max() ?? 0)")
+                Text("\(gameModel.cheatsUsed)")
+            }
+
+            LazyVGrid(columns: columnsTimesToBeat, spacing: 10) {
+                // Table headers
+                Label("Number", systemImage: "number")
+                Label("Beat", systemImage: "trophy")
+                Label("Current", systemImage: "figure.run")
+                
+                if lastTwoTiles.count >= 2 {
+                    ForEach(lastTwoTiles.sorted(by: >), id: \.self) { tile in
+                        gridRow(for: tile, useData: true)
+                    }
+                } else if lastTwoTiles.count == 1 {
+                    // First row: static values for tile 16
+                    gridRow(for: 16, useData: false)
+                    // Second row: dynamic values for tile 8
+                    gridRow(for: 8, useData: true)
+                } else {
+                    // Both rows: static values when no data is available
+                    gridRow(for: 16, useData: false)
+                    gridRow(for: 8, useData: false)
                 }
-            } else if lastTwoTiles.count == 1 {
-                // First row: static values for tile 16
-                gridRow(for: 16, useData: false)
-                // Second row: dynamic values for tile 8
-                gridRow(for: 8, useData: true)
-            } else {
-                // Both rows: static values when no data is available
-                gridRow(for: 16, useData: false)
-                gridRow(for: 8, useData: false)
             }
         }
         .padding()
@@ -98,7 +116,7 @@ struct ContentView: View {
 
     }
     
-    @ViewBuilder private var controlButtons: some View {
+    @ViewBuilder private var controlButtonsView: some View {
         HStack(spacing: 10) {
             undoButton
             addFourButton
@@ -107,7 +125,7 @@ struct ContentView: View {
         .padding()
     }
 
-    @ViewBuilder private var gameBoard: some View {
+    @ViewBuilder private var gameBoardView: some View {
         GeometryReader { geo in
             let side = geo.size.width
             let cellSize = side / boardDimension
@@ -211,13 +229,7 @@ struct ContentView: View {
             )
         }
     }
-    
-    @ViewBuilder private var newPerfectGameButton: some View {
-        Button("Perfect") {
-            gameModel.newPerfectGame()
-        }
-    }
-    
+     
     @ViewBuilder private var undoButton: some View {
         Button(action: { gameModel.undo() }) {
             Text("Undo")
