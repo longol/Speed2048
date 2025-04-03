@@ -21,6 +21,12 @@ struct GameState: Codable {
     let tiles: [Tile]
     let seconds: Int
     let undoStack: [[Tile]]
+    let gameLevel: GameLevel
+    let animationDurationSlide: Double
+    let animationDurationShowHide: Double
+    let boardSize: Int
+    let tileDurations: [Int: [Int]]
+    let lastTileTimestamps: [Int: Int]
 }
 
 struct TimingInfo: Codable {
@@ -84,6 +90,15 @@ enum GameLevel: String, Codable, CaseIterable {
         case .regular: return 0
         case .easy: return 1
         case .onlyFours: return 2
+        }
+    }
+    
+    var penaltyString: String {
+        switch self {
+        case .onlyTwos: return "Gain a second!"
+        case .regular: return "No penalty."
+        case .easy: return "Loose 1 second."
+        case .onlyFours: return "Loose 2 seconds!"
         }
     }
 }

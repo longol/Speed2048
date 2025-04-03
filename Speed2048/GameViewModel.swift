@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CloudKit
 
 /// The view model that holds the game state.
 class GameViewModel: ObservableObject {
@@ -34,10 +35,16 @@ class GameViewModel: ObservableObject {
     var tileDurations: [Int: [Int]] = [:]        // E.g., [8: [10, 9], 16: [29]]
     var lastTileTimestamps: [Int: Int] = [:]       // E.g., [8: 15, 16: 40]
 
+    let container = CKContainer(identifier: "iCloud.Speed2048")
+    var privateDatabase: CKDatabase {
+        return container.privateCloudDatabase
+    }
+    
     init() {
         loadGameState()
     }
 
+    // MARK: GAME MECHANICS
     func newGame() {
         tiles = []
         undoStack = []
@@ -49,67 +56,7 @@ class GameViewModel: ObservableObject {
         addRandomTile()
         startTimer() // Start the timer only after the game is initialized
     }
-
-    struct GameState: Codable {
-        let tiles: [Tile]
-        let seconds: Int
-        let undoStack: [[Tile]]
-        let gameLevel: GameLevel
-        let animationDurationSlide: Double
-        let animationDurationShowHide: Double
-        let boardSize: Int
-        let tileDurations: [Int: [Int]]
-        let lastTileTimestamps: [Int: Int]
-    }
-
-    func saveGameState() {
-        let gameState = GameState(
-            tiles: tiles,
-            seconds: seconds,
-            undoStack: undoStack,
-            gameLevel: gameLevel,
-            animationDurationSlide: animationDurationSlide,
-            animationDurationShowHide: animationDurationShowHide,
-            boardSize: boardSize,
-            tileDurations: tileDurations,
-            lastTileTimestamps: lastTileTimestamps
-        )
-        if let data = try? JSONEncoder().encode(gameState) {
-            do {
-                try data.write(to: gameStateFileURL, options: .atomic)
-                print("Game state saved to \(gameStateFileURL)")
-            } catch {
-                print("Failed to save game state: \(error.localizedDescription)")
-            }
-        }
-        stopTimer() // Stop the timer when saving the game state
-    }
-
-    func loadGameState() {
-        do {
-            let data = try Data(contentsOf: gameStateFileURL)
-            if let gameState = try? JSONDecoder().decode(GameState.self, from: data) {
-                self.tiles = gameState.tiles
-                self.seconds = gameState.seconds
-                self.undoStack = gameState.undoStack
-                self.gameLevel = gameState.gameLevel
-                self.animationDurationSlide = gameState.animationDurationSlide
-                self.animationDurationShowHide = gameState.animationDurationShowHide
-                self.boardSize = gameState.boardSize
-                self.tileDurations = gameState.tileDurations
-                self.lastTileTimestamps = gameState.lastTileTimestamps
-
-                if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
-                print("Game state loaded from \(gameStateFileURL)")
-            } else {
-                newGame() // If decoding fails, start a new game
-            }
-        } catch {
-            print("No saved game state found, starting a new game.")
-            newGame() // If no saved state exists, start a new game
-        }
-    }
-
+    
     func startTimer() {
         guard timer == nil else { return } // Ensure the timer is not already running
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -139,18 +86,6 @@ class GameViewModel: ObservableObject {
         tileAdded(value) // Track timing for the added tile
     }
     
-    /// Immediately adds a tile with a value of 4.
-    func forceTile() {
-        let emptyPositions = getEmptyPositions()
-        guard !emptyPositions.isEmpty, let pos = emptyPositions.randomElement() else { return }
-        let tile = Tile(id: UUID(), value: 4, row: pos.row, col: pos.col)
-        withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
-            tiles.append(tile)
-        }
-        showPenaltyAlert(.addFourPenalty)
-        tileAdded(tile.value) // Track timing for the added tile
-    }
-    
     func getEmptyPositions() -> [(row: Int, col: Int)] {
         var positions: [(Int, Int)] = []
         for row in 0..<boardSize {
@@ -176,7 +111,7 @@ class GameViewModel: ObservableObject {
             _ = undoStack.popLast()
         }
     }
-    
+
     /// Unified move function that handles all four directions in two stages:
     ///   1. Animate sliding tiles to their new positions.
     ///   2. After sliding is done, merge tiles and remove the merging tiles.
@@ -293,6 +228,8 @@ class GameViewModel: ObservableObject {
         return moved
     }
     
+    // MARK: CHEATS
+
     /// Undo the last move.
     func undo() {
         if let previousState = undoStack.popLast() {
@@ -303,8 +240,22 @@ class GameViewModel: ObservableObject {
         }
     }
 
+    /// Immediately adds a tile with a value of 4.
+    func forceTile() {
+        let emptyPositions = getEmptyPositions()
+        guard !emptyPositions.isEmpty, let pos = emptyPositions.randomElement() else { return }
+        let tile = Tile(id: UUID(), value: 4, row: pos.row, col: pos.col)
+        withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
+            tiles.append(tile)
+        }
+        showPenaltyAlert(.addFourPenalty)
+        tileAdded(tile.value) // Track timing for the added tile
+    }
+    
+    // MARK: SCORING
+
     /// Show a penalty alert and reset it after a delay.
-    private func showPenaltyAlert(_ penalty: PenaltyType) {
+    func showPenaltyAlert(_ penalty: PenaltyType) {
         let amount = penalty.amount(withLevel: gameLevel)
         penaltyAlert = "\(penalty.rawValue) +\(amount)s!"
         seconds += amount
@@ -369,7 +320,141 @@ class GameViewModel: ObservableObject {
             return "N/A"
         }
     }
+    
+    // MARK: DATA MANAGEMENT
 
+    func saveGameStateLocally() {
+        stopTimer() // Stop the timer when saving the game state
+
+        let gameState = GameState(
+            tiles: tiles,
+            seconds: seconds,
+            undoStack: undoStack,
+            gameLevel: gameLevel,
+            animationDurationSlide: animationDurationSlide,
+            animationDurationShowHide: animationDurationShowHide,
+            boardSize: boardSize,
+            tileDurations: tileDurations,
+            lastTileTimestamps: lastTileTimestamps
+        )
+        if let data = try? JSONEncoder().encode(gameState) {
+            do {
+                try data.write(to: gameStateFileURL, options: .atomic)
+                print("Game state saved to \(gameStateFileURL)")
+            } catch {
+                print("Failed to save game state: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func loadGameStateLocally() {
+        do {
+            let data = try Data(contentsOf: gameStateFileURL)
+            if let gameState = try? JSONDecoder().decode(GameState.self, from: data) {
+                self.tiles = gameState.tiles
+                self.seconds = gameState.seconds
+                self.undoStack = gameState.undoStack
+                self.gameLevel = gameState.gameLevel
+                self.animationDurationSlide = gameState.animationDurationSlide
+                self.animationDurationShowHide = gameState.animationDurationShowHide
+                self.boardSize = gameState.boardSize
+                self.tileDurations = gameState.tileDurations
+                self.lastTileTimestamps = gameState.lastTileTimestamps
+
+                if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
+                print("Game state loaded from \(gameStateFileURL)")
+            } else {
+                newGame() // If decoding fails, start a new game
+            }
+        } catch {
+            print("No saved game state found, starting a new game.")
+            newGame() // If no saved state exists, start a new game
+        }
+    }
+
+    func saveGameState() {
+        
+        let record = CKRecord(recordType: "GameState", recordID: CKRecord.ID(recordName: "currentGame"))
+        let gameState = GameState(
+            tiles: tiles,
+            seconds: seconds,
+            undoStack: undoStack,
+            gameLevel: gameLevel,
+            animationDurationSlide: animationDurationSlide,
+            animationDurationShowHide: animationDurationShowHide,
+            boardSize: boardSize,
+            tileDurations: tileDurations,
+            lastTileTimestamps: lastTileTimestamps
+        )
+        
+        do {
+            let data = try JSONEncoder().encode(gameState)
+            record["stateData"] = data
+            privateDatabase.save(record) { (savedRecord, error) in
+                if let error = error {
+                    print("Failed to save to CloudKit: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        self.saveGameStateLocally()
+                    }
+                } else {
+                    print("Game state saved to CloudKit")
+                }
+            }
+        } catch {
+            print("Failed to encode game state: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.saveGameStateLocally()
+            }
+        }
+    }
+
+    // Load the game state from CloudKit's private database
+    func loadGameState() {
+        
+        let recordID = CKRecord.ID(recordName: "currentGame")
+    
+        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
+            if let error = error {
+                print("Failed to load from CloudKit: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+                return
+            }
+            
+            guard let record = record, let data = record["stateData"] as? Data else {
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+                return
+            }
+            
+            do {
+                let gameState = try JSONDecoder().decode(GameState.self, from: data)
+                DispatchQueue.main.async {
+                    self.tiles = gameState.tiles
+                    self.seconds = gameState.seconds
+                    self.undoStack = gameState.undoStack
+                    self.gameLevel = gameState.gameLevel
+                    self.animationDurationSlide = gameState.animationDurationSlide
+                    self.animationDurationShowHide = gameState.animationDurationShowHide
+                    self.boardSize = gameState.boardSize
+                    self.tileDurations = gameState.tileDurations
+                    self.lastTileTimestamps = gameState.lastTileTimestamps
+                    
+                    if !self.tiles.isEmpty {
+                        self.startTimer() // Resume timer if game is active
+                    }
+                    print("Game state loaded from CloudKit")
+                }
+            } catch {
+                print("Failed to decode game state: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+            }
+        }
+    }
 }
 
 

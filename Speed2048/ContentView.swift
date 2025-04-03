@@ -8,7 +8,7 @@ import AppKit
 /// The main game view.
 struct ContentView: View {
     @StateObject var gameModel: GameViewModel
-    @Environment(\.scenePhase) var scenePhase
+//    @Environment(\.scenePhase) var scenePhase
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
@@ -79,7 +79,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder private var headerView: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .center) {
             HStack {
                 Text("Speed 2048")
                     .font(.largeTitle)
@@ -89,12 +89,11 @@ struct ContentView: View {
                 
                 settingsButton
             }
-            
-            Text("Elapsed time: \(gameModel.seconds.formattedAsTime)")
-                .bold()
-            
+                        
             timesToBeat
-            
+
+            Text("Elapsed time: \(gameModel.seconds.formattedAsTime)")
+
         }
         .padding()
     }

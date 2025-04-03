@@ -5,6 +5,7 @@ struct SettingsView: View {
     @StateObject var gameModel: GameViewModel
 
     var body: some View {
+        
         VStack(alignment: .center) {
             
             header
@@ -53,14 +54,20 @@ struct SettingsView: View {
     
     @ViewBuilder private var gameLevelPicker: some View {
         VStack(alignment: .center) {
-            Text("Game Level").bold()
+            HStack {
+                Text("Game Level").bold()
+                Spacer()
+                Text(gameModel.gameLevel.penaltyString)
+                    .font(.footnote)
+            }
             Picker("Game Level", selection: $gameModel.gameLevel) {
                 ForEach(GameLevel.allCases, id: \.self) { level in
                     Text(level.rawValue).tag(level)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
-            Text("Penalty: \(gameModel.gameLevel.penaltyAmount)s")
+            
+            
         }
         .padding()
     }
@@ -73,26 +80,34 @@ struct SettingsView: View {
             GridItem(.flexible(), alignment: .center)
         ]
         
-        LazyVGrid(columns: columns, spacing: 10) {
-            // Table headers
-            Label("Number", systemImage: "number")
-            Label("Beat", systemImage: "trophy")
-            Label("Current", systemImage: "figure.run")
+        VStack(spacing: 0) {
             
-            ForEach(gameModel.tileDurations.keys.sorted(by: >), id: \.self) { tile in
-                Group {
-                    Text("\(tile)").bold()
-
-                    Group {
-                        Text(gameModel.averageTimeString(for: tile))
-                        Text(gameModel.currentTimeString(for: tile))
+            // Table headers
+            HStack {
+                Label("Number", systemImage: "number").frame(maxWidth: .infinity)
+                Label("Beat", systemImage: "trophy").frame(maxWidth: .infinity)
+                Label("Current", systemImage: "figure.run").frame(maxWidth: .infinity)
+            }
+            ScrollView {
+                
+                LazyVGrid(columns: columns, spacing: 10) {
+                    
+                    ForEach(gameModel.tileDurations.keys.sorted(by: >), id: \.self) { tile in
+                        Group {
+                            Text("\(tile)").bold()
+                            
+                            Group {
+                                Text(gameModel.averageTimeString(for: tile))
+                                Text(gameModel.currentTimeString(for: tile))
+                            }
+                            .foregroundColor(fgColor(tile: tile))
+                        }
+                        
                     }
-                    .foregroundColor(fgColor(tile: tile))
                 }
-
+                .padding()
             }
         }
-        .padding()
     }
  
     func fgColor(tile: Int) -> Color {
