@@ -63,7 +63,7 @@ struct ContentView: View {
             
             LazyVGrid(columns: columnsScoresTop, spacing: 10) {
                 scoreUnit(text: "Time", icon: "clock", value: gameModel.seconds.formattedAsTime)
-                scoreUnit(text: "Sum", icon: "sum", value: String("\(gameModel.totalScore)"))
+                scoreUnit(text: "Sum", icon: "sum", value: gameModel.totalScore.formatted())
             }
             
             Divider()
@@ -76,9 +76,9 @@ struct ContentView: View {
 
             LazyVGrid(columns: columnsScoresBottom, spacing: 10) {
             
-                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: String("\(2 * (gameModel.tiles.map { $0.value }.max() ?? 0))"))
-                scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: String("\(gameModel.undosUsed)"))
-                scoreUnit(text:"+4s", icon: "die.face.4", value: String("\(gameModel.manual4sUsed)"))
+                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
+                scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameModel.undosUsed.formatted())
+                scoreUnit(text:"+4s", icon: "die.face.4", value: gameModel.manual4sUsed.formatted())
             }
         }
         .padding()
