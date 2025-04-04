@@ -15,6 +15,7 @@ class GameViewModel: ObservableObject {
     @Published var tileDurations: [Int: [Int]] = [:]        // E.g., [8: [10, 9], 16: [29]]
     @Published var seconds: Int = 0
     @Published var gameLevel: GameLevel = .regular
+    @Published var fastAnimations: Bool = false
     @Published var tiles: [Tile] = []
     
     @Published var totalScore: Int = 0
@@ -25,8 +26,13 @@ class GameViewModel: ObservableObject {
     private var lastTileTimestamps: [Int: Int] = [:]       // E.g., [8: 15, 16: 40]
 
     // MARK: Game Settings
-    private var animationDurationSlide: Double = 0.08
-    private var animationDurationShowHide: Double = 0.02
+    var animationDurationSlide: Double {
+        return fastAnimations ? 0.01 : 0.1
+    }
+    var animationDurationShowHide: Double {
+        return fastAnimations ? 0.01 : 0.1
+    }
+    
     private var boardSize = 4
     private var tileStartCountValue = 8
     
@@ -50,81 +56,13 @@ class GameViewModel: ObservableObject {
 
     @Published var showVersionChoiceAlert: Bool = false
     var fetchedCloudGameState: GameState? = nil
-
-
-    
     init() {
-        loadGameState()
+        checkCloudVersion()
     }
 
     // MARK: GAME MECHANICS
     func newGame() {
-        stopTimer() // Ensure the timer is stopped before starting a new game
-        checkCloudVersion()
-
-//        tiles = []
-//        undoStack = []
-//        seconds = 0
-//        cheatsUsed = 0
-//        undosUsed = 0
-//        manual4sUsed = 0
-//        tileDurations = [:]
-//        lastTileTimestamps = [:]
-//        addRandomTile()
-//        addRandomTile()
-//        startTimer() // Start the timer only after the game is initialized
-    }
-    
-    func checkCloudVersion() {
-
-        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
-            DispatchQueue.main.async {
-                if let record = record,
-                   let data = record["stateData"] as? Data,
-                   let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
-                    // Cloud game found – store it and notify the view.
-                    self.fetchedCloudGameState = cloudState
-                    self.showVersionChoiceAlert = true
-                } else {
-                    // No cloud state found; start a new local game.
-                    self.newLocalGame()
-                }
-            }
-        }
-    }
-
-    func applyVersionChoice(useCloud: Bool) {
-        if useCloud, let cloudGameState = fetchedCloudGameState {
-            applyGameState(cloudGameState)
-        } else {
-            self.newLocalGame()
-            self.saveGameState() // Overwrite cloud with current game state.
-        }
-        // Reset temporary variables.
-        self.showVersionChoiceAlert = false
-        self.fetchedCloudGameState = nil
-    }
-    
-    // Applies the given game state to the view model.
-    func applyGameState(_ gameState: GameState) {
-        self.tiles = gameState.tiles
-        self.seconds = gameState.seconds
-        self.undoStack = gameState.undoStack
-        self.gameLevel = gameState.gameLevel
-        self.animationDurationSlide = gameState.animationDurationSlide
-        self.animationDurationShowHide = gameState.animationDurationShowHide
-        self.boardSize = gameState.boardSize
-        self.tileDurations = gameState.tileDurations
-        self.lastTileTimestamps = gameState.lastTileTimestamps
-        self.cheatsUsed = gameState.cheatsUsed
-        self.undosUsed = gameState.undosUsed
-        self.manual4sUsed = gameState.manual4sUsed
-        
-        if !self.tiles.isEmpty { self.startTimer() }
-    }
-    
-    // Starts a new local game.
-    func newLocalGame() {
+        stopTimer()
         tiles = []
         undoStack = []
         seconds = 0
@@ -138,6 +76,52 @@ class GameViewModel: ObservableObject {
         startTimer() // Start the timer only after the game is initialized
     }
 
+    func checkCloudVersion() {
+
+        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
+            DispatchQueue.main.async {
+                if let record = record,
+                   let data = record["stateData"] as? Data,
+                   let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
+                    // Cloud game found – store it and notify the view.
+                    self.fetchedCloudGameState = cloudState
+                    self.showVersionChoiceAlert = true
+                } else {
+                    // No cloud state found; start a new local game.
+                    self.newGame()
+                }
+            }
+        }
+    }
+
+    func applyVersionChoice(useCloud: Bool) {
+        if useCloud, let cloudGameState = fetchedCloudGameState {
+            applyGameState(cloudGameState)
+        } else {
+            self.newGame()
+            self.saveGameState() // Overwrite cloud with current game state.
+        }
+        // Reset temporary variables.
+        self.showVersionChoiceAlert = false
+        self.fetchedCloudGameState = nil
+    }
+    
+    func applyGameState(_ gameState: GameState) {
+        self.tiles = gameState.tiles
+        self.seconds = gameState.seconds
+        self.undoStack = gameState.undoStack
+        self.gameLevel = gameState.gameLevel
+        self.fastAnimations = gameState.fastAnimations
+        self.boardSize = gameState.boardSize
+        self.tileDurations = gameState.tileDurations
+        self.lastTileTimestamps = gameState.lastTileTimestamps
+        self.cheatsUsed = gameState.cheatsUsed
+        self.undosUsed = gameState.undosUsed
+        self.manual4sUsed = gameState.manual4sUsed
+        
+        if !self.tiles.isEmpty { self.startTimer() }
+    }
+    
     func startTimer() {
         guard timer == nil else { return } // Ensure the timer is not already running
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -353,8 +337,7 @@ class GameViewModel: ObservableObject {
                     self.seconds = gameState.seconds
                     self.undoStack = gameState.undoStack
                     self.gameLevel = gameState.gameLevel
-                    self.animationDurationSlide = gameState.animationDurationSlide
-                    self.animationDurationShowHide = gameState.animationDurationShowHide
+                    self.fastAnimations = gameState.fastAnimations
                     self.boardSize = gameState.boardSize
                     self.tileDurations = gameState.tileDurations
                     self.lastTileTimestamps = gameState.lastTileTimestamps
@@ -380,8 +363,7 @@ class GameViewModel: ObservableObject {
                 self.seconds = gameState.seconds
                 self.undoStack = gameState.undoStack
                 self.gameLevel = gameState.gameLevel
-                self.animationDurationSlide = gameState.animationDurationSlide
-                self.animationDurationShowHide = gameState.animationDurationShowHide
+                self.fastAnimations = gameState.fastAnimations
                 self.boardSize = gameState.boardSize
                 self.tileDurations = gameState.tileDurations
                 self.lastTileTimestamps = gameState.lastTileTimestamps
@@ -392,11 +374,11 @@ class GameViewModel: ObservableObject {
                 if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
                 print("Game state loaded from \(gameStateFileURL)")
             } else {
-                newLocalGame() // If decoding fails, start a new game
+                newGame() // If decoding fails, start a new game
             }
         } catch {
             print("No saved game state found, starting a new game.")
-            newLocalGame() // If no saved state exists, start a new game
+            newGame() // If no saved state exists, start a new game
         }
     }
     func saveGameState() {
@@ -407,8 +389,7 @@ class GameViewModel: ObservableObject {
             seconds: seconds,
             undoStack: undoStack,
             gameLevel: gameLevel,
-            animationDurationSlide: animationDurationSlide,
-            animationDurationShowHide: animationDurationShowHide,
+            fastAnimations: fastAnimations,
             boardSize: boardSize,
             tileDurations: tileDurations,
             lastTileTimestamps: lastTileTimestamps,

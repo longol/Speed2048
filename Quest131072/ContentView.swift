@@ -36,7 +36,7 @@ struct ContentView: View {
         
     @ViewBuilder private var headerView: some View {
         HStack {
-            Text("131072 Quest")
+            Text("Quest for 131072")
                 .font(.largeTitle)
                 .bold()
             
@@ -57,7 +57,7 @@ struct ContentView: View {
         VStack {
         
             LazyVGrid(columns: columnsTwo, spacing: 10) {
-                scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.rawValue)
+                scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.description)
                 scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
             }
 

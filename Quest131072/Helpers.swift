@@ -26,8 +26,7 @@ struct GameState: Codable {
     let seconds: Int
     let undoStack: [[Tile]]
     let gameLevel: GameLevel
-    let animationDurationSlide: Double
-    let animationDurationShowHide: Double
+    let fastAnimations: Bool
     let boardSize: Int
     let tileDurations: [Int: [Int]]
     let lastTileTimestamps: [Int: Int]
@@ -72,11 +71,24 @@ enum PenaltyType: String {
     }
 }
 
-enum GameLevel: String, Codable, CaseIterable {
-    case onlyTwos = "Only 2s"
-    case regular = "2s > 4s"
-    case easy = "2s < 4s"
-    case onlyFours = "Only 4s"
+enum GameLevel: Codable, CaseIterable {
+    case onlyTwos
+    case regular
+    case easy
+    case onlyFours
+    
+    var description: String {
+        switch self {
+        case .onlyTwos:
+            return "Only 2s"
+        case .regular:
+            return "2s > 4s"
+        case .easy:
+            return "2s < 4s"
+        case .onlyFours:
+            return "Only 4s"
+        }
+    }
     
     var probabilityOfFours: Double {
         switch self {

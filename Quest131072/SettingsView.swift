@@ -1,18 +1,31 @@
 import SwiftUI
 
+enum AnimationLevel: String, CaseIterable {
+    case smooth = "Smooth"
+    case fast = "Fast"
+}
+
 struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject var gameModel: GameViewModel
-
+    
     var body: some View {
         
-        VStack(alignment: .center) {
+        VStack(alignment: .leading) {
             
             header
-            
+
+            Divider()
+
             gameLevelPicker
-        
+            
+            Divider()
+            
+            animationSpeedToggle
+            
             Spacer()
+            
+            Divider()
             
             contactView
         }
@@ -30,7 +43,38 @@ struct SettingsView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "xmark")
-//                    .foregroundColor(.black)
+            }
+        }
+    }
+    
+    @ViewBuilder private var gameLevelPicker: some View {
+        VStack(alignment: .leading) {
+
+            Text("Game Level").bold()
+            
+            Picker("Game Level", selection: $gameModel.gameLevel) {
+                ForEach(GameLevel.allCases, id: \.self) { level in
+                    Text(level.description).tag(level)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            
+            HStack {
+                Spacer()
+                Text(gameModel.gameLevel.penaltyString)
+                    .font(.caption)
+                Spacer()
+            }
+            
+            
+        }
+    }
+    
+    @ViewBuilder private var animationSpeedToggle: some View {
+        VStack(alignment: .leading) {
+            Text("Animation Levels").bold()
+            Toggle(isOn: $gameModel.fastAnimations) {
+                Label("Fast animations?", systemImage: "hare")
             }
         }
     }
@@ -44,27 +88,7 @@ struct SettingsView: View {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(5)
-
-        }
-    }
-    
-    @ViewBuilder private var gameLevelPicker: some View {
-        VStack(alignment: .center) {
-            HStack {
-                Text("Game Level").bold()
-                Spacer()
-                Text(gameModel.gameLevel.penaltyString)
-                    .font(.footnote)
-            }
-            Picker("Game Level", selection: $gameModel.gameLevel) {
-                ForEach(GameLevel.allCases, id: \.self) { level in
-                    Text(level.rawValue).tag(level)
-                }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            
             
         }
-        .padding()
     }
 }
