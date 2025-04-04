@@ -23,6 +23,10 @@ struct SettingsView: View {
             
             animationSpeedToggle
             
+            Divider()
+            
+            perfectBoardButton
+            
             Spacer()
             
             Divider()
@@ -79,16 +83,33 @@ struct SettingsView: View {
         }
     }
     
-    @ViewBuilder private var contactView: some View {
-        HStack {
-            Text("Send us your feedback!")
-            Link("Visit site", destination: URL(string: "https://lucaslongo.com/speed2048/")!)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(5)
+    @ViewBuilder private var perfectBoardButton: some View {
+        VStack(alignment: .center) {
             
+            Button(action: {
+                gameModel.setPerfectBoard()
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Label("Show The Perfect Board!", systemImage: "star.fill")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.green)
+        }
+        .padding()
+    }
+    
+    @ViewBuilder private var contactView: some View {
+        VStack(alignment: .leading, spacing: 10) {
+
+            HStack {
+                Text("Send us your feedback!")
+                Link("Visit site", destination: URL(string: "https://lucaslongo.com/quest131072/")!)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(5)
+            }
         }
     }
 }

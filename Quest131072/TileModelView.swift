@@ -25,9 +25,9 @@ struct TileView: View {
             RoundedRectangle(cornerRadius: cellSize * 0.1)
                 .fill(tile.value.colorForValue)
             Text("\(tile.value)")
-                .font(.system(size: cellSize * 0.3, weight: .bold))
+                .font(.system(size: cellSize * 0.25, weight: .bold))
                 .foregroundColor(.white)
-                .minimumScaleFactor(0.1) // Adjust the scale factor as needed
+                .minimumScaleFactor(0.05) // Adjust the scale factor as needed
                 .lineLimit(1) // Ensure the text is on a single line
         }
         .frame(width: cellSize - 4, height: cellSize - 4)

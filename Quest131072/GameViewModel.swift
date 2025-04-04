@@ -311,6 +311,30 @@ class GameViewModel: ObservableObject {
 
     }
 
+    func setPerfectBoard() {
+        stopTimer()
+        tiles = [
+            Tile(id: UUID(), value: 131072, row: 0, col: 0),
+            Tile(id: UUID(), value: 65536, row: 0, col: 1),
+            Tile(id: UUID(), value: 32768, row: 0, col: 2),
+            Tile(id: UUID(), value: 16384, row: 0, col: 3),
+            Tile(id: UUID(), value: 8192, row: 1, col: 0),
+            Tile(id: UUID(), value: 4096, row: 1, col: 1),
+            Tile(id: UUID(), value: 2048, row: 1, col: 2),
+            Tile(id: UUID(), value: 1024, row: 1, col: 3),
+            Tile(id: UUID(), value: 512, row: 2, col: 0),
+            Tile(id: UUID(), value: 256, row: 2, col: 1),
+            Tile(id: UUID(), value: 128, row: 2, col: 2),
+            Tile(id: UUID(), value: 64, row: 2, col: 3),
+            Tile(id: UUID(), value: 32, row: 3, col: 0),
+            Tile(id: UUID(), value: 16, row: 3, col: 1),
+            Tile(id: UUID(), value: 8, row: 3, col: 2),
+            Tile(id: UUID(), value: 4, row: 3, col: 3)
+        ]
+        totalScore = tiles.reduce(0) { $0 + $1.value }
+        startTimer()
+    }
+
     // MARK: DATA MANAGEMENT
     func loadGameState() {
         
