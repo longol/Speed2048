@@ -18,9 +18,10 @@ Your ultimate challenge: Arrange all tiles perfectly, creating the ideal board f
 - **Dynamic Scoring & Milestones** to celebrate your achievements.
 
 ## Screenshots
-<img src="https://github.com/user-attachments/assets/56e35770-5d83-4bee-9e1c-a0c5436ca77f" alt="Quest 131072 Logo" width="250">
-<img src="https://github.com/user-attachments/assets/b58709af-defe-4e58-89c7-315bcadeee85" alt="Quest 131072 Logo" width="250">
-<img src="https://github.com/user-attachments/assets/28892e8e-2787-4afe-b0c0-7e151333ece7" alt="Quest 131072 Logo" width="250">
+<img src="https://github.com/user-attachments/assets/14ec2cc9-bbc9-49ed-8b70-3a2f3e65c4c0" alt="Quest 131072 Logo" height="450">
+<img src="https://github.com/user-attachments/assets/177640a2-ef53-416d-9906-d235ecf5ed6f" alt="Quest 131072 Logo" height="450">
+<img src="https://github.com/user-attachments/assets/bf061b98-165c-40e8-b4da-36ad927f6467" alt="Quest 131072 Logo" height="450">
+<img src="https://github.com/user-attachments/assets/c254b2a7-cbde-4725-911b-3b745f9f9604" alt="Quest 131072 Logo" height="450">
 
 ### Requirements
 
