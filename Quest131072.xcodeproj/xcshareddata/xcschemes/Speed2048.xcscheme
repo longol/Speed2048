@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A85FA9322D9CE3A800959E76"
-               BuildableName = "Speed2048.app"
-               BlueprintName = "Speed2048"
-               ReferencedContainer = "container:Speed2048.xcodeproj">
+               BuildableName = "Quest131072.app"
+               BlueprintName = "Quest131072"
+               ReferencedContainer = "container:Quest131072.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A85FA9322D9CE3A800959E76"
-            BuildableName = "Speed2048.app"
-            BlueprintName = "Speed2048"
-            ReferencedContainer = "container:Speed2048.xcodeproj">
+            BuildableName = "Quest131072.app"
+            BlueprintName = "Quest131072"
+            ReferencedContainer = "container:Quest131072.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A85FA9322D9CE3A800959E76"
-            BuildableName = "Speed2048.app"
-            BlueprintName = "Speed2048"
-            ReferencedContainer = "container:Speed2048.xcodeproj">
+            BuildableName = "Quest131072.app"
+            BlueprintName = "Quest131072"
+            ReferencedContainer = "container:Quest131072.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

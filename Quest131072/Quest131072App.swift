@@ -1,6 +1,6 @@
 //
-//  Endless2048App.swift
-//  Endless2048
+//  Quest131072App.swift
+//  Quest131072
 //
 //  Created by Lucas Longo on 2/22/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Speed2048App: App {
+struct Quest131072App: App {
     @StateObject private var gameModel = GameViewModel()
     @Environment(\.scenePhase) var scenePhase
 

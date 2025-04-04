@@ -30,7 +30,7 @@ struct SettingsView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "xmark")
-                    .foregroundColor(.black)
+//                    .foregroundColor(.black)
             }
         }
     }
