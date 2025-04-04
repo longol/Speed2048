@@ -16,18 +16,12 @@ struct ContentView: View {
     let boardDimension: CGFloat = 4
     let cellSize: CGFloat = 80
     
-    var lastTwoTiles : [Int] {
-        Array(gameModel.tileDurations.keys.sorted().suffix(2))
-    }
-    
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             headerView
-            
-            controlButtonsView
-            
+            scoresView
             Spacer()
-            
+            gameButtonsView
             gameBoardView
             
         }
@@ -41,72 +35,50 @@ struct ContentView: View {
     }
         
     @ViewBuilder private var headerView: some View {
-        VStack(alignment: .center) {
-            HStack {
-                Text("131072 Quest")
-                    .font(.largeTitle)
-                    .bold()
-                
-                Spacer()
-                
-                settingsButton
-            }
-                        
-            scoresView
+        HStack {
+            Text("131072 Quest")
+                .font(.largeTitle)
+                .bold()
+            
+            Spacer()
 
-
+            settingsButton
         }
         .padding()
     }
    
     @ViewBuilder private var scoresView: some View {
         
-        let columnsScores = [
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center)
-        ]
-        let columnsTimesToBeat = [
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center)
+        let columnsScoresTop = [
+            GridItem(.flexible(), alignment: .leading),
+            GridItem(.flexible(), alignment: .trailing),
         ]
         
         VStack {
-
-            LazyVGrid(columns: columnsScores, spacing: 10) {
-                Image(systemName: "clock")
-                Image(systemName: "sum")
-                Image(systemName: "flag.pattern.checkered")
-                Image(systemName: "circle.grid.cross.up.filled")
-
-                Text("\(gameModel.seconds.formattedAsTime)")
-                Text("\(gameModel.totalScore)")
-                Text("\(gameModel.tiles.map { $0.value }.max() ?? 0)")
-                Text("\(gameModel.cheatsUsed)")
+        
+            HStack {
+                Text("Difficulty level: ").bold()
+                Text(gameModel.gameLevel.rawValue)
             }
+            
+            LazyVGrid(columns: columnsScoresTop, spacing: 10) {
+                scoreUnit(text: "Time", icon: "clock", value: gameModel.seconds.formattedAsTime)
+                scoreUnit(text: "Sum", icon: "sum", value: String("\(gameModel.totalScore)"))
+            }
+            
+            Divider()
+            
+            let columnsScoresBottom = [
+                GridItem(.flexible(), alignment: .leading),
+                GridItem(.flexible(), alignment: .leading),
+                GridItem(.flexible(), alignment: .trailing),
+            ]
 
-            LazyVGrid(columns: columnsTimesToBeat, spacing: 10) {
-                // Table headers
-                Label("Number", systemImage: "number")
-                Label("Beat", systemImage: "trophy")
-                Label("Current", systemImage: "figure.run")
-                
-                if lastTwoTiles.count >= 2 {
-                    ForEach(lastTwoTiles.sorted(by: >), id: \.self) { tile in
-                        gridRow(for: tile, useData: true)
-                    }
-                } else if lastTwoTiles.count == 1 {
-                    // First row: static values for tile 16
-                    gridRow(for: 16, useData: false)
-                    // Second row: dynamic values for tile 8
-                    gridRow(for: 8, useData: true)
-                } else {
-                    // Both rows: static values when no data is available
-                    gridRow(for: 16, useData: false)
-                    gridRow(for: 8, useData: false)
-                }
+            LazyVGrid(columns: columnsScoresBottom, spacing: 10) {
+            
+                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: String("\(2 * (gameModel.tiles.map { $0.value }.max() ?? 0))"))
+                scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: String("\(gameModel.undosUsed)"))
+                scoreUnit(text:"+4s", icon: "die.face.4", value: String("\(gameModel.manual4sUsed)"))
             }
         }
         .padding()
@@ -116,10 +88,20 @@ struct ContentView: View {
 
     }
     
-    @ViewBuilder private var controlButtonsView: some View {
+    @ViewBuilder private func scoreUnit(text: String, icon: String, value: String) -> some View {
+        HStack {
+            Label(text, systemImage: icon)
+                .italic()
+            Text(value)
+                .bold()
+        }
+    }
+
+    @ViewBuilder private var gameButtonsView: some View {
         HStack(spacing: 10) {
             undoButton
             addFourButton
+            Spacer()
             newButton
         }
         .padding()
@@ -176,33 +158,6 @@ struct ContentView: View {
         .layoutPriority(1)  // ensure the game board isn't squeezed by other views
     }
 
-    func fgColor(tile: Int) -> Color {
-        if let curr = gameModel.secondsSinceLast(for: tile), let avg = gameModel.averageTime(for: tile) {
-            return Double(curr) > avg ? .red : .green
-        }
-        
-        return .black
-    }
-    
-    @ViewBuilder private func gridRow(for tile: Int, useData: Bool) -> some View {
-        
-        Group {
-            Text("\(tile)").bold()
-
-            Group {
-                if useData {
-                    Text(gameModel.averageTimeString(for: tile))
-                    Text(gameModel.currentTimeString(for: tile))
-                } else {
-                    Text("-")
-                    Text("-")
-                }
-            }
-            .foregroundColor(fgColor(tile: tile))
-        }
-
-    }
-    
     @ViewBuilder private var settingsButton: some View {
         Button {
             showSettings.toggle()
@@ -210,14 +165,33 @@ struct ContentView: View {
         } label: {
             Image(systemName: "gear")
         }
+        .keyboardShortcut(",", modifiers: [.command])
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(colors: [Color.purple, Color.orange]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            maxHeight: 40,
+            minWidth: 40
+        )
+
     }
     
     @ViewBuilder private var newButton: some View {
         Button(action: { showAlert = true }) {
-            Text("New")
+            Image(systemName: "plus.circle")
         }
-        .gameButtonStyle(gradient: LinearGradient(gradient: Gradient(colors: [Color.green, Color.teal]), startPoint: .topLeading, endPoint: .bottomTrailing))
         .keyboardShortcut("n", modifiers: [.command])
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(colors: [Color.green, Color.teal]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            maxHeight: 40,
+            minWidth: 40
+        )
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Start New Game"),

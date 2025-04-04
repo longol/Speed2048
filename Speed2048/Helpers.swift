@@ -73,10 +73,10 @@ enum PenaltyType: String {
 }
 
 enum GameLevel: String, Codable, CaseIterable {
-    case onlyTwos = "Only 2s"
-    case regular = "Regular"
-    case easy = "Easy"
-    case onlyFours = "Only 4s"
+    case onlyTwos = "only 2s"
+    case regular = "2s > 4s"
+    case easy = "2s < 4s"
+    case onlyFours = "only 4s"
     
     var probabilityOfFours: Double {
         switch self {

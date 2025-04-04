@@ -12,10 +12,6 @@ struct SettingsView: View {
             
             gameLevelPicker
         
-            Divider()
-            
-            timesToBeat
-            
             Spacer()
             
             contactView
@@ -70,51 +66,5 @@ struct SettingsView: View {
             
         }
         .padding()
-    }
-
-    @ViewBuilder private var timesToBeat: some View {
-        
-        let columns = [
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center),
-            GridItem(.flexible(), alignment: .center)
-        ]
-        
-        VStack(spacing: 0) {
-            
-            // Table headers
-            HStack {
-                Label("Number", systemImage: "number").frame(maxWidth: .infinity)
-                Label("Beat", systemImage: "trophy").frame(maxWidth: .infinity)
-                Label("Current", systemImage: "figure.run").frame(maxWidth: .infinity)
-            }
-            ScrollView {
-                
-                LazyVGrid(columns: columns, spacing: 10) {
-                    
-                    ForEach(gameModel.tileDurations.keys.sorted(by: >), id: \.self) { tile in
-                        Group {
-                            Text("\(tile)").bold()
-                            
-                            Group {
-                                Text(gameModel.averageTimeString(for: tile))
-                                Text(gameModel.currentTimeString(for: tile))
-                            }
-                            .foregroundColor(fgColor(tile: tile))
-                        }
-                        
-                    }
-                }
-                .padding()
-            }
-        }
-    }
- 
-    func fgColor(tile: Int) -> Color {
-        if let curr = gameModel.secondsSinceLast(for: tile), let avg = gameModel.averageTime(for: tile) {
-            return Double(curr) > avg ? .red : .green
-        }
-        
-        return .black
     }
 }

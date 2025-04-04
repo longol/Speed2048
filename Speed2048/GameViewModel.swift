@@ -18,36 +18,14 @@ class GameViewModel: ObservableObject {
     @Published var gameLevel: GameLevel = .regular
     @Published var tiles: [Tile] = []
     
+    @Published var totalScore: Int = 0
     @Published var cheatsUsed: Int = 0
     @Published var undosUsed: Int = 0
     @Published var manual4sUsed: Int = 0
 
     private var lastTileTimestamps: [Int: Int] = [:]       // E.g., [8: 15, 16: 40]
 
-    var totalScore: Int {
-        tiles.reduce(0) { $0 + $1.value }
-    }
-    var perfectBoardProgress: Double {
-        let idealTiles = [
-            131072, 65536, 32768, 16384,
-            8192, 4096, 2048, 1024,
-            512, 256, 128, 64,
-            32, 16, 8, 4
-        ]
-
-        let currentTileValuesSorted = tiles.map(\.value).sorted(by: >)
-        
-        var matchedTiles = 0
-        for (index, tile) in currentTileValuesSorted.enumerated() {
-            if index < idealTiles.count && tile == idealTiles[index] {
-                matchedTiles += 1
-            } else {
-                break
-            }
-        }
-        
-        return Double(matchedTiles) / Double(idealTiles.count)
-    }
+    
 
     // MARK: Game Settings
     private var animationDurationSlide: Double = 0.08
@@ -118,7 +96,6 @@ class GameViewModel: ObservableObject {
         withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
             tiles.append(tile)
         }
-        tileAdded(value) // Track timing for the added tile
     }
     
     func getEmptyPositions() -> [(row: Int, col: Int)] {
@@ -239,8 +216,8 @@ class GameViewModel: ObservableObject {
                 if let mainIndex = self.tiles.firstIndex(where: { $0.id == merge.mainTileID }) {
                     withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
                         self.tiles[mainIndex].value = merge.newValue
+                        self.totalScore += merge.newValue
                     }
-                    self.tileAdded(merge.newValue) // Track timing for the merged tile
                 }
                 
                 // Animate the removal of the merging tile.
@@ -277,7 +254,6 @@ class GameViewModel: ObservableObject {
         withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
             tiles.append(tile)
         }
-        tileAdded(tile.value)
         
         manual4sUsed += 1
         cheatsUsed += 1
@@ -296,64 +272,80 @@ class GameViewModel: ObservableObject {
         }
     }
 
-    func tileAdded(_ tileValue: Int) {
-        guard tileValue >= tileStartCountValue else { return }
-        
-        var interval = seconds
-        // If this tile has been produced before, compute the time interval.
-        if let lastTime = lastTileTimestamps[tileValue] {
-            interval = seconds - lastTime
-        }
-        
-        tileDurations[tileValue, default: []].append(interval)
-
-        // Record the current timestamp for this tile.
-        lastTileTimestamps[tileValue] = seconds
-    }
-
-    // Returns the average time (in seconds) for a given tile value.
-    func averageTime(for tileValue: Int) -> Double? {
-        guard let durations = tileDurations[tileValue], !durations.isEmpty else { return nil }
-        let sum = durations.reduce(0, +)
-        return Double(sum) / Double(durations.count)
-    }
-
-    // Returns the seconds since the last appearance of the given tile value.
-    func secondsSinceLast(for tileValue: Int) -> Int? {
-        guard let lastTime = lastTileTimestamps[tileValue] else { return nil }
-        return seconds - lastTime
-    }
-
-    // A helper function to produce a display string for each tile's stats.
-    func displayStats(for tileValue: Int) -> String {
-        if let avg = averageTime(for: tileValue) {
-            let current = secondsSinceLast(for: tileValue) ?? 0
-            // Format as: "Tile 8: Beat 9.5 sec | Current: 3 sec"
-            return "Tile \(tileValue): Beat \(String(format: "%.1f", avg)) sec | Current: \(current) sec"
-        } else {
-            return "Tile \(tileValue): No data yet"
-        }
-    }
-    
-    // Returns a formatted string for the average time to produce a given tile.
-    func averageTimeString(for tileValue: Int) -> String {
-        if let avg = averageTime(for: tileValue) {
-            return Int(avg).formattedAsTime
-        } else {
-            return "No data"
-        }
-    }
-
-    // Returns a formatted string for the current time (seconds since last appearance) of a given tile.
-    func currentTimeString(for tileValue: Int) -> String {
-        if let current = secondsSinceLast(for: tileValue) {
-            return current.formattedAsTime
-        } else {
-            return "N/A"
-        }
-    }
-    
     // MARK: DATA MANAGEMENT
+    func loadGameState() {
+        
+        let recordID = CKRecord.ID(recordName: "currentGame")
+    
+        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
+            if let error = error {
+                print("Failed to load from CloudKit: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+                return
+            }
+            
+            guard let record = record, let data = record["stateData"] as? Data else {
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+                return
+            }
+            
+            do {
+                let gameState = try JSONDecoder().decode(GameState.self, from: data)
+                DispatchQueue.main.async {
+                    self.tiles = gameState.tiles
+                    self.seconds = gameState.seconds
+                    self.undoStack = gameState.undoStack
+                    self.gameLevel = gameState.gameLevel
+                    self.animationDurationSlide = gameState.animationDurationSlide
+                    self.animationDurationShowHide = gameState.animationDurationShowHide
+                    self.boardSize = gameState.boardSize
+                    self.tileDurations = gameState.tileDurations
+                    self.lastTileTimestamps = gameState.lastTileTimestamps
+                    
+                    if !self.tiles.isEmpty {
+                        self.startTimer() // Resume timer if game is active
+                    }
+                    print("Game state loaded from CloudKit")
+                }
+            } catch {
+                print("Failed to decode game state: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.loadGameStateLocally()
+                }
+            }
+        }
+    }
+    func loadGameStateLocally() {
+        do {
+            let data = try Data(contentsOf: gameStateFileURL)
+            if let gameState = try? JSONDecoder().decode(GameState.self, from: data) {
+                self.tiles = gameState.tiles
+                self.seconds = gameState.seconds
+                self.undoStack = gameState.undoStack
+                self.gameLevel = gameState.gameLevel
+                self.animationDurationSlide = gameState.animationDurationSlide
+                self.animationDurationShowHide = gameState.animationDurationShowHide
+                self.boardSize = gameState.boardSize
+                self.tileDurations = gameState.tileDurations
+                self.lastTileTimestamps = gameState.lastTileTimestamps
+                self.cheatsUsed = gameState.cheatsUsed
+                self.undosUsed = gameState.undosUsed
+                self.manual4sUsed = gameState.manual4sUsed
+
+                if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
+                print("Game state loaded from \(gameStateFileURL)")
+            } else {
+                newGame() // If decoding fails, start a new game
+            }
+        } catch {
+            print("No saved game state found, starting a new game.")
+            newGame() // If no saved state exists, start a new game
+        }
+    }
     func saveGameState() {
         stopTimer() // Pause the timer during save to avoid inconsistencies
 
@@ -406,7 +398,6 @@ class GameViewModel: ObservableObject {
             print("Failed to encode game state: \(error.localizedDescription)")
         }
     }
-    
     func saveGameStateLocally(gameState: GameState) {
         stopTimer() // Stop the timer when saving the game state
 
@@ -420,82 +411,6 @@ class GameViewModel: ObservableObject {
         }
     }
 
-
-    // Load the game state from CloudKit's private database
-    func loadGameState() {
-        
-        let recordID = CKRecord.ID(recordName: "currentGame")
-    
-        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
-            if let error = error {
-                print("Failed to load from CloudKit: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
-                }
-                return
-            }
-            
-            guard let record = record, let data = record["stateData"] as? Data else {
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
-                }
-                return
-            }
-            
-            do {
-                let gameState = try JSONDecoder().decode(GameState.self, from: data)
-                DispatchQueue.main.async {
-                    self.tiles = gameState.tiles
-                    self.seconds = gameState.seconds
-                    self.undoStack = gameState.undoStack
-                    self.gameLevel = gameState.gameLevel
-                    self.animationDurationSlide = gameState.animationDurationSlide
-                    self.animationDurationShowHide = gameState.animationDurationShowHide
-                    self.boardSize = gameState.boardSize
-                    self.tileDurations = gameState.tileDurations
-                    self.lastTileTimestamps = gameState.lastTileTimestamps
-                    
-                    if !self.tiles.isEmpty {
-                        self.startTimer() // Resume timer if game is active
-                    }
-                    print("Game state loaded from CloudKit")
-                }
-            } catch {
-                print("Failed to decode game state: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
-                }
-            }
-        }
-    }
-    
-    func loadGameStateLocally() {
-        do {
-            let data = try Data(contentsOf: gameStateFileURL)
-            if let gameState = try? JSONDecoder().decode(GameState.self, from: data) {
-                self.tiles = gameState.tiles
-                self.seconds = gameState.seconds
-                self.undoStack = gameState.undoStack
-                self.gameLevel = gameState.gameLevel
-                self.animationDurationSlide = gameState.animationDurationSlide
-                self.animationDurationShowHide = gameState.animationDurationShowHide
-                self.boardSize = gameState.boardSize
-                self.tileDurations = gameState.tileDurations
-                self.lastTileTimestamps = gameState.lastTileTimestamps
-                self.cheatsUsed = gameState.cheatsUsed
-                self.undosUsed = gameState.undosUsed
-                self.manual4sUsed = gameState.manual4sUsed
-
-                if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
-                print("Game state loaded from \(gameStateFileURL)")
-            } else {
-                newGame() // If decoding fails, start a new game
-            }
-        } catch {
-            print("No saved game state found, starting a new game.")
-            newGame() // If no saved state exists, start a new game
-        }
-    }
 }
 
 
