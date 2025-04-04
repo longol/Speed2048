@@ -12,7 +12,6 @@ import CloudKit
 class GameViewModel: ObservableObject {
 
     // MARK: Scoring
-    @Published var penaltyAlert: String = "Let's get started!"
     @Published var tileDurations: [Int: [Int]] = [:]        // E.g., [8: [10, 9], 16: [29]]
     @Published var seconds: Int = 0
     @Published var gameLevel: GameLevel = .regular
@@ -24,8 +23,6 @@ class GameViewModel: ObservableObject {
     @Published var manual4sUsed: Int = 0
 
     private var lastTileTimestamps: [Int: Int] = [:]       // E.g., [8: 15, 16: 40]
-
-    
 
     // MARK: Game Settings
     private var animationDurationSlide: Double = 0.08
@@ -40,6 +37,8 @@ class GameViewModel: ObservableObject {
 
     // MARK: CloudKit and Data Management
     private let container = CKContainer(identifier: "iCloud.com.lucaslongo.Quest131072")
+    private let recordID = CKRecord.ID(recordName: "currentGame")
+
     private var privateDatabase: CKDatabase {
         return container.privateCloudDatabase
     }
@@ -49,6 +48,10 @@ class GameViewModel: ObservableObject {
         return directory.appendingPathComponent("Speed2048.json")
     }
 
+    @Published var showVersionChoiceAlert: Bool = false
+    var fetchedCloudGameState: GameState? = nil
+
+
     
     init() {
         loadGameState()
@@ -56,9 +59,74 @@ class GameViewModel: ObservableObject {
 
     // MARK: GAME MECHANICS
     func newGame() {
+        stopTimer() // Ensure the timer is stopped before starting a new game
+        checkCloudVersion()
+
+//        tiles = []
+//        undoStack = []
+//        seconds = 0
+//        cheatsUsed = 0
+//        undosUsed = 0
+//        manual4sUsed = 0
+//        tileDurations = [:]
+//        lastTileTimestamps = [:]
+//        addRandomTile()
+//        addRandomTile()
+//        startTimer() // Start the timer only after the game is initialized
+    }
+    
+    func checkCloudVersion() {
+
+        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
+            DispatchQueue.main.async {
+                if let record = record,
+                   let data = record["stateData"] as? Data,
+                   let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
+                    // Cloud game found – store it and notify the view.
+                    self.fetchedCloudGameState = cloudState
+                    self.showVersionChoiceAlert = true
+                } else {
+                    // No cloud state found; start a new local game.
+                    self.newLocalGame()
+                }
+            }
+        }
+    }
+
+    func applyVersionChoice(useCloud: Bool) {
+        if useCloud, let cloudGameState = fetchedCloudGameState {
+            applyGameState(cloudGameState)
+        } else {
+            self.newLocalGame()
+            self.saveGameState() // Overwrite cloud with current game state.
+        }
+        // Reset temporary variables.
+        self.showVersionChoiceAlert = false
+        self.fetchedCloudGameState = nil
+    }
+    
+    // Applies the given game state to the view model.
+    func applyGameState(_ gameState: GameState) {
+        self.tiles = gameState.tiles
+        self.seconds = gameState.seconds
+        self.undoStack = gameState.undoStack
+        self.gameLevel = gameState.gameLevel
+        self.animationDurationSlide = gameState.animationDurationSlide
+        self.animationDurationShowHide = gameState.animationDurationShowHide
+        self.boardSize = gameState.boardSize
+        self.tileDurations = gameState.tileDurations
+        self.lastTileTimestamps = gameState.lastTileTimestamps
+        self.cheatsUsed = gameState.cheatsUsed
+        self.undosUsed = gameState.undosUsed
+        self.manual4sUsed = gameState.manual4sUsed
+        
+        if !self.tiles.isEmpty { self.startTimer() }
+    }
+    
+    // Starts a new local game.
+    func newLocalGame() {
         tiles = []
         undoStack = []
-        stopTimer() // Ensure the timer is stopped before starting a new game
         seconds = 0
         cheatsUsed = 0
         undosUsed = 0
@@ -69,7 +137,7 @@ class GameViewModel: ObservableObject {
         addRandomTile()
         startTimer() // Start the timer only after the game is initialized
     }
-    
+
     func startTimer() {
         guard timer == nil else { return } // Ensure the timer is not already running
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -243,7 +311,6 @@ class GameViewModel: ObservableObject {
             }
             undosUsed += 1
             cheatsUsed += 1
-            showPenaltyAlert(.undoPenalty)
         }
     }
 
@@ -257,26 +324,12 @@ class GameViewModel: ObservableObject {
         
         manual4sUsed += 1
         cheatsUsed += 1
-        
-        showPenaltyAlert(.addFourPenalty)
 
-    }
-    
-    // MARK: SCORING
-    func showPenaltyAlert(_ penalty: PenaltyType) {
-        let amount = penalty.amount(withLevel: gameLevel)
-        penaltyAlert = "\(penalty.rawValue) +\(amount)s!"
-        seconds += amount
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // Reset after 2 seconds
-            self.penaltyAlert = "Keep going!"
-        }
     }
 
     // MARK: DATA MANAGEMENT
     func loadGameState() {
         
-        let recordID = CKRecord.ID(recordName: "currentGame")
-    
         privateDatabase.fetch(withRecordID: recordID) { (record, error) in
             if let error = error {
                 print("Failed to load from CloudKit: \(error.localizedDescription)")
@@ -339,17 +392,16 @@ class GameViewModel: ObservableObject {
                 if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
                 print("Game state loaded from \(gameStateFileURL)")
             } else {
-                newGame() // If decoding fails, start a new game
+                newLocalGame() // If decoding fails, start a new game
             }
         } catch {
             print("No saved game state found, starting a new game.")
-            newGame() // If no saved state exists, start a new game
+            newLocalGame() // If no saved state exists, start a new game
         }
     }
     func saveGameState() {
         stopTimer() // Pause the timer during save to avoid inconsistencies
-
-        let recordID = CKRecord.ID(recordName: "currentGame")
+        
         let gameState = GameState(
             tiles: tiles,
             seconds: seconds,
@@ -376,7 +428,7 @@ class GameViewModel: ObservableObject {
                     recordToSave = existingRecord
                 } else {
                     // If it doesn't exist (or fetch failed for another reason), create a new one
-                    recordToSave = CKRecord(recordType: "GameState", recordID: recordID)
+                    recordToSave = CKRecord(recordType: "GameState", recordID: self.recordID)
                 }
                 
                 // Step 2: Set the updated data

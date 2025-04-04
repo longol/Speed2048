@@ -49,52 +49,45 @@ struct ContentView: View {
    
     @ViewBuilder private var scoresView: some View {
         
-        let columnsScoresTop = [
+        let columnsTwo = [
             GridItem(.flexible(), alignment: .leading),
             GridItem(.flexible(), alignment: .trailing),
         ]
         
         VStack {
         
-            HStack {
-                Text("Difficulty level: ").bold()
-                Text(gameModel.gameLevel.rawValue)
+            LazyVGrid(columns: columnsTwo, spacing: 10) {
+                scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.rawValue)
+                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
             }
-            
-            LazyVGrid(columns: columnsScoresTop, spacing: 10) {
+
+            LazyVGrid(columns: columnsTwo, spacing: 10) {
                 scoreUnit(text: "Time", icon: "clock", value: gameModel.seconds.formattedAsTime)
                 scoreUnit(text: "Sum", icon: "sum", value: gameModel.totalScore.formatted())
             }
+                   
+            LazyVGrid(columns: columnsTwo, spacing: 10) {
             
-            Divider()
-            
-            let columnsScoresBottom = [
-                GridItem(.flexible(), alignment: .leading),
-                GridItem(.flexible(), alignment: .leading),
-                GridItem(.flexible(), alignment: .trailing),
-            ]
-
-            LazyVGrid(columns: columnsScoresBottom, spacing: 10) {
-            
-                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
                 scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameModel.undosUsed.formatted())
                 scoreUnit(text:"+4s", icon: "die.face.4", value: gameModel.manual4sUsed.formatted())
             }
+            
+            Divider()
         }
         .padding()
-        .font(.system(size: 18, weight: .medium))
-        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
-        .lineLimit(1)             // keep it on one line
 
     }
     
     @ViewBuilder private func scoreUnit(text: String, icon: String, value: String) -> some View {
         HStack {
-            Label(text, systemImage: icon)
-                .italic()
+            Label("\(text):", systemImage: icon)
+                .font(.system(size: 18, weight: .bold))
             Text(value)
-                .bold()
+                .font(.system(size: 18, weight: .regular))
         }
+        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
+        .lineLimit(1)             // keep it on one line
+
     }
 
     @ViewBuilder private var gameButtonsView: some View {
