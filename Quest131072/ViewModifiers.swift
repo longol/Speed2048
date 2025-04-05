@@ -27,7 +27,7 @@ struct GameButtonModifier: ViewModifier {
 
 
 extension View {
-    func gameButtonStyle(gradient: LinearGradient, maxHeight: Double = 40, minWidth: CGFloat = 100) -> some View {
+    func gameButtonStyle(gradient: LinearGradient, maxHeight: Double = 55, minWidth: CGFloat = 100) -> some View {
         self.modifier(
             GameButtonModifier(
                 gradient: gradient,

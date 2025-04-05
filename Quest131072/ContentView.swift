@@ -176,14 +176,15 @@ struct ContentView: View {
         .keyboardShortcut(",", modifiers: [.command])
         .gameButtonStyle(
             gradient: LinearGradient(
-                gradient: Gradient(colors: [Color.purple, Color.orange]),
+                gradient: Gradient(
+                    colors: [64.colorForValue, 32768.colorForValue]
+                ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
             maxHeight: 40,
             minWidth: 40
         )
-
     }
     
     @ViewBuilder private var newButton: some View {
@@ -193,11 +194,13 @@ struct ContentView: View {
         .keyboardShortcut("n", modifiers: [.command])
         .gameButtonStyle(
             gradient: LinearGradient(
-                gradient: Gradient(colors: [Color.green, Color.teal]),
+                gradient: Gradient(
+                    colors: [64.colorForValue, 8192.colorForValue]
+                ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            maxHeight: 40,
+            maxHeight: 55,
             minWidth: 40
         )
         .alert(isPresented: $showAlert) {
@@ -216,8 +219,15 @@ struct ContentView: View {
         Button(action: { gameModel.undo() }) {
             Text("Undo")
         }
-        .gameButtonStyle(gradient: LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
-                                                  startPoint: .topLeading, endPoint: .bottomTrailing))
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(
+                    colors: [64.colorForValue, 256.colorForValue]
+                ),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .keyboardShortcut("z", modifiers: [.command])
     }
     
@@ -225,8 +235,15 @@ struct ContentView: View {
         Button(action: { gameModel.forceTile() }) {
             Text("+4")
         }
-        .gameButtonStyle(gradient: LinearGradient(gradient: Gradient(colors: [Color.red, Color.yellow]),
-                                                  startPoint: .topLeading, endPoint: .bottomTrailing))
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(
+                    colors: [64.colorForValue, 2048.colorForValue]
+                ),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .keyboardShortcut("4", modifiers: [.command])
     }
 

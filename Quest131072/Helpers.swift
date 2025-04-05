@@ -93,9 +93,9 @@ enum GameLevel: Codable, CaseIterable {
         case .onlyTwos:
             return 0
         case .regular:
-            return 0.25
+            return 0.10
         case .easy:
-            return 0.75
+            return 0.90
         case .onlyFours:
             return 1
         }
