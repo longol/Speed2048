@@ -17,12 +17,10 @@ struct Quest131072App: App {
             ContentView(gameModel: gameModel)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            if newPhase == .background {
-                // Save game state when the app goes to the background.
+            if newPhase == .background || newPhase == .inactive {
                 gameModel.saveGameState()
             } else if newPhase == .active {
-                // Load game state when the app becomes a1ctive.
-                gameModel.loadGameState()
+                gameModel.checkCloudVersion()
             }
         }
     }

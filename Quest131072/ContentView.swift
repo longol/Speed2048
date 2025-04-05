@@ -32,6 +32,21 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView(gameModel: gameModel)
         }
+        .alert(isPresented: $gameModel.showVersionChoiceAlert) {
+            Alert(
+                title: Text("Cloud Game Found"),
+                message: Text("Cloud game with higher score found. Use it or use your local version?"),
+                primaryButton: .default(Text("Use Cloud")) {
+                    gameModel.applyVersionChoice(useCloud: true)
+                },
+                secondaryButton: .destructive(Text("Use Local")) {
+                    gameModel.applyVersionChoice(useCloud: false)
+                }
+            )
+        }
+        .onDisappear {
+            gameModel.saveGameState()
+        }
     }
         
     @ViewBuilder private var headerView: some View {

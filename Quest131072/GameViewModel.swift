@@ -12,7 +12,6 @@ import CloudKit
 class GameViewModel: ObservableObject {
 
     // MARK: Scoring
-    @Published var tileDurations: [Int: [Int]] = [:]        // E.g., [8: [10, 9], 16: [29]]
     @Published var seconds: Int = 0
     @Published var gameLevel: GameLevel = .regular
     @Published var fastAnimations: Bool = false
@@ -22,8 +21,6 @@ class GameViewModel: ObservableObject {
     @Published var cheatsUsed: Int = 0
     @Published var undosUsed: Int = 0
     @Published var manual4sUsed: Int = 0
-
-    private var lastTileTimestamps: [Int: Int] = [:]       // E.g., [8: 15, 16: 40]
 
     // MARK: Game Settings
     var animationDurationSlide: Double {
@@ -51,11 +48,12 @@ class GameViewModel: ObservableObject {
     private var gameStateFileURL: URL {
         let fileManager = FileManager.default
         let directory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return directory.appendingPathComponent("Speed2048.json")
+        return directory.appendingPathComponent("Quest131072.json")
     }
 
     @Published var showVersionChoiceAlert: Bool = false
     var fetchedCloudGameState: GameState? = nil
+    
     init() {
         checkCloudVersion()
     }
@@ -69,57 +67,9 @@ class GameViewModel: ObservableObject {
         cheatsUsed = 0
         undosUsed = 0
         manual4sUsed = 0
-        tileDurations = [:]
-        lastTileTimestamps = [:]
         addRandomTile()
         addRandomTile()
         startTimer() // Start the timer only after the game is initialized
-    }
-
-    func checkCloudVersion() {
-
-        privateDatabase.fetch(withRecordID: recordID) { (record, error) in
-            DispatchQueue.main.async {
-                if let record = record,
-                   let data = record["stateData"] as? Data,
-                   let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
-                    // Cloud game found – store it and notify the view.
-                    self.fetchedCloudGameState = cloudState
-                    self.showVersionChoiceAlert = true
-                } else {
-                    // No cloud state found; start a new local game.
-                    self.newGame()
-                }
-            }
-        }
-    }
-
-    func applyVersionChoice(useCloud: Bool) {
-        if useCloud, let cloudGameState = fetchedCloudGameState {
-            applyGameState(cloudGameState)
-        } else {
-            self.newGame()
-            self.saveGameState() // Overwrite cloud with current game state.
-        }
-        // Reset temporary variables.
-        self.showVersionChoiceAlert = false
-        self.fetchedCloudGameState = nil
-    }
-    
-    func applyGameState(_ gameState: GameState) {
-        self.tiles = gameState.tiles
-        self.seconds = gameState.seconds
-        self.undoStack = gameState.undoStack
-        self.gameLevel = gameState.gameLevel
-        self.fastAnimations = gameState.fastAnimations
-        self.boardSize = gameState.boardSize
-        self.tileDurations = gameState.tileDurations
-        self.lastTileTimestamps = gameState.lastTileTimestamps
-        self.cheatsUsed = gameState.cheatsUsed
-        self.undosUsed = gameState.undosUsed
-        self.manual4sUsed = gameState.manual4sUsed
-        
-        if !self.tiles.isEmpty { self.startTimer() }
     }
     
     func startTimer() {
@@ -336,50 +286,62 @@ class GameViewModel: ObservableObject {
     }
 
     // MARK: DATA MANAGEMENT
-    func loadGameState() {
+    func checkCloudVersion() {
+        
+        loadGameStateLocally()
         
         privateDatabase.fetch(withRecordID: recordID) { (record, error) in
-            if let error = error {
-                print("Failed to load from CloudKit: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
-                }
-                return
-            }
-            
-            guard let record = record, let data = record["stateData"] as? Data else {
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
-                }
-                return
-            }
-            
-            do {
-                let gameState = try JSONDecoder().decode(GameState.self, from: data)
-                DispatchQueue.main.async {
-                    self.tiles = gameState.tiles
-                    self.seconds = gameState.seconds
-                    self.undoStack = gameState.undoStack
-                    self.gameLevel = gameState.gameLevel
-                    self.fastAnimations = gameState.fastAnimations
-                    self.boardSize = gameState.boardSize
-                    self.tileDurations = gameState.tileDurations
-                    self.lastTileTimestamps = gameState.lastTileTimestamps
-                    
-                    if !self.tiles.isEmpty {
-                        self.startTimer() // Resume timer if game is active
+            DispatchQueue.main.async {
+                if let record = record,
+                   let asset = record["stateAsset"] as? CKAsset,
+                   let fileURL = asset.fileURL {
+                    do {
+                        let data = try Data(contentsOf: fileURL)
+                        if let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
+                            // Compare scores and decide action
+                            if cloudState.totalScore > self.totalScore {
+                                // Cloud version has a higher score, prompt the user
+                                self.fetchedCloudGameState = cloudState
+                                self.showVersionChoiceAlert = true
+                            }
+                        }
+                    } catch {
+                        print("Failed to load cloud game state: \(error.localizedDescription)")
                     }
-                    print("Game state loaded from CloudKit")
-                }
-            } catch {
-                print("Failed to decode game state: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.loadGameStateLocally()
+                } else {
+                    // No cloud state found or fetch failed, save the current game
+                    print("Failed to find cloud stateAsset")
                 }
             }
         }
     }
+
+    func applyVersionChoice(useCloud: Bool) {
+        if useCloud, let cloudGameState = fetchedCloudGameState {
+            applyGameState(cloudGameState)
+        } 
+        // Reset temporary variables.
+        self.showVersionChoiceAlert = false
+        self.fetchedCloudGameState = nil
+    }
+    
+    func applyGameState(_ gameState: GameState) {
+        
+        self.tiles = gameState.tiles
+        self.seconds = gameState.seconds
+        self.undoStack = gameState.undoStack
+        self.gameLevel = gameState.gameLevel
+        self.fastAnimations = gameState.fastAnimations
+        self.totalScore = gameState.totalScore
+        self.cheatsUsed = gameState.cheatsUsed
+        self.undosUsed = gameState.undosUsed
+        self.manual4sUsed = gameState.manual4sUsed
+        
+        if !self.tiles.isEmpty { self.startTimer() }
+    }
+
     func loadGameStateLocally() {
+        
         do {
             let data = try Data(contentsOf: gameStateFileURL)
             if let gameState = try? JSONDecoder().decode(GameState.self, from: data) {
@@ -388,15 +350,13 @@ class GameViewModel: ObservableObject {
                 self.undoStack = gameState.undoStack
                 self.gameLevel = gameState.gameLevel
                 self.fastAnimations = gameState.fastAnimations
-                self.boardSize = gameState.boardSize
-                self.tileDurations = gameState.tileDurations
-                self.lastTileTimestamps = gameState.lastTileTimestamps
+                self.totalScore = gameState.totalScore
                 self.cheatsUsed = gameState.cheatsUsed
                 self.undosUsed = gameState.undosUsed
                 self.manual4sUsed = gameState.manual4sUsed
 
                 if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
-                print("Game state loaded from \(gameStateFileURL)")
+                print("Game state LOCAL")
             } else {
                 newGame() // If decoding fails, start a new game
             }
@@ -405,49 +365,48 @@ class GameViewModel: ObservableObject {
             newGame() // If no saved state exists, start a new game
         }
     }
+
     func saveGameState() {
         stopTimer() // Pause the timer during save to avoid inconsistencies
-        
+
         let gameState = GameState(
             tiles: tiles,
             seconds: seconds,
             undoStack: undoStack,
             gameLevel: gameLevel,
             fastAnimations: fastAnimations,
-            boardSize: boardSize,
-            tileDurations: tileDurations,
-            lastTileTimestamps: lastTileTimestamps,
+            totalScore: totalScore,
             cheatsUsed: cheatsUsed,
             undosUsed: undosUsed,
             manual4sUsed: manual4sUsed
         )
 
+        saveGameStateLocally(gameState: gameState)
+        
         do {
             let data = try JSONEncoder().encode(gameState)
-            
-            // Step 1: Try to fetch the existing record
+            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("GameState.json")
+            try data.write(to: tempFileURL)
+
             privateDatabase.fetch(withRecordID: recordID) { (record, error) in
                 let recordToSave: CKRecord
                 if let existingRecord = record {
-                    // If the record exists, use it
                     recordToSave = existingRecord
                 } else {
-                    // If it doesn't exist (or fetch failed for another reason), create a new one
                     recordToSave = CKRecord(recordType: "GameState", recordID: self.recordID)
                 }
-                
-                // Step 2: Set the updated data
-                recordToSave["stateData"] = data
-                
-                // Step 3: Save the record (this will update if it exists, or create if it doesn't)
+
+                recordToSave["stateAsset"] = CKAsset(fileURL: tempFileURL)
+
                 self.privateDatabase.save(recordToSave) { (savedRecord, saveError) in
-                    DispatchQueue.main.async {
-                        if let error = saveError {
-                            print("Failed to save to CloudKit: \(error.localizedDescription)")
-                            self.saveGameStateLocally(gameState: gameState)
-                        } else {
-                            print("Game state saved to CloudKit")
-                        }
+                    if let saveError = saveError as? CKError, saveError.code == .serverRecordChanged {
+                        // Handle conflict by fetching the latest record and retrying
+                        self.resolveCloudConflict(tempFileURL: tempFileURL)
+                    } else if let saveError = saveError {
+                        print("Failed to save to CloudKit: \(saveError.localizedDescription)")
+                        self.saveGameStateLocally(gameState: gameState)
+                    } else {
+                        print("Game state saved to CloudKit")
                     }
                 }
             }
@@ -455,13 +414,35 @@ class GameViewModel: ObservableObject {
             print("Failed to encode game state: \(error.localizedDescription)")
         }
     }
+
+    private func resolveCloudConflict(tempFileURL: URL) {
+        privateDatabase.fetch(withRecordID: recordID) { (latestRecord, fetchError) in
+            guard let latestRecord = latestRecord, fetchError == nil else {
+                print("Failed to fetch latest record for conflict resolution: \(fetchError?.localizedDescription ?? "Unknown error")")
+                return
+            }
+
+            latestRecord["stateAsset"] = CKAsset(fileURL: tempFileURL)
+
+            self.privateDatabase.save(latestRecord) { (savedRecord, saveError) in
+                DispatchQueue.main.async {
+                    if let saveError = saveError {
+                        print("Failed to resolve conflict and save to CloudKit: \(saveError.localizedDescription)")
+                    } else {
+                        print("Conflict resolved and game state saved to CloudKit")
+                    }
+                }
+            }
+        }
+    }
+
     func saveGameStateLocally(gameState: GameState) {
         stopTimer() // Stop the timer when saving the game state
 
         if let data = try? JSONEncoder().encode(gameState) {
             do {
                 try data.write(to: gameStateFileURL, options: .atomic)
-                print("Game state saved to \(gameStateFileURL)")
+                print("Game state saved LOCAL")
             } catch {
                 print("Failed to save game state: \(error.localizedDescription)")
             }
