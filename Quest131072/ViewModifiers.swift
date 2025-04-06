@@ -14,7 +14,7 @@ struct GameButtonModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .font(.headline)
+            .font(.system(size: 32, weight: .bold))
             .padding()
             .frame(minWidth: minWidth, maxHeight: maxHeight)
             .background(gradient)

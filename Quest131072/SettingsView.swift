@@ -61,7 +61,11 @@ struct SettingsView: View {
                     Text(level.description).tag(level)
                 }
             }
+            #if os(watchOS)
+            .pickerStyle(InlinePickerStyle())
+            #else
             .pickerStyle(SegmentedPickerStyle())
+            #endif
             
             HStack {
                 Spacer()

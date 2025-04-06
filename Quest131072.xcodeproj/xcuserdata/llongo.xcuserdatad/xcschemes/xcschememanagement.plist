@@ -4,17 +4,22 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Quest131072.xcscheme_^#shared#^_</key>
+		<key>Speed2048w Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>Speed2048.xcscheme_^#shared#^_</key>
+		<key>TV.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>3</integer>
 		</dict>
-		<key>Speed2048w Watch App.xcscheme_^#shared#^_</key>
+		<key>Watch App.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>iOS MacOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
@@ -22,6 +27,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>A8551C662DA19C3700D96AAD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>A85FA9322D9CE3A800959E76</key>
 		<dict>
 			<key>primary</key>

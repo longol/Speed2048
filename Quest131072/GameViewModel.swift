@@ -310,7 +310,7 @@ class GameViewModel: ObservableObject {
                     }
                 } else {
                     // No cloud state found or fetch failed, save the current game
-                    print("Failed to find cloud stateAsset")
+                    print("Failed to find cloud stateAsset: \(error?.localizedDescription ?? "unknown error")")
                 }
             }
         }
@@ -356,7 +356,7 @@ class GameViewModel: ObservableObject {
                 self.manual4sUsed = gameState.manual4sUsed
 
                 if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
-                print("Game state LOCAL")
+                print("Game state loaded from LOCAL")
             } else {
                 newGame() // If decoding fails, start a new game
             }

@@ -1,14 +1,10 @@
 import SwiftUI
-#if os(macOS)
-import AppKit
-#endif
 
 // MARK: - Views
 
 /// The main game view.
 struct ContentView: View {
     @StateObject var gameModel: GameViewModel
-//    @Environment(\.scenePhase) var scenePhase
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
@@ -17,17 +13,19 @@ struct ContentView: View {
     let cellSize: CGFloat = 80
     
     var body: some View {
-        VStack(alignment: .center, spacing: 0) {
-            headerView
-            scoresView
-            Spacer()
-            gameButtonsView
-            gameBoardView
-            
+        HStack(alignment: .top) {
+            VStack(alignment: .center, spacing: 0) {
+                headerView
+                scoresView
+                Spacer()
+            }
+            VStack(alignment: .center) {
+                gameButtonsView
+                Spacer()
+                gameBoardView
+                Spacer()
+            }
         }
-        #if os(macOS)
-        .frame(minWidth: 400, minHeight: 500)
-        #endif
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .sheet(isPresented: $showSettings) {
             SettingsView(gameModel: gameModel)
@@ -56,61 +54,55 @@ struct ContentView: View {
                 .bold()
             
             Spacer()
-
-            settingsButton
+        
         }
         .padding()
     }
    
     @ViewBuilder private var scoresView: some View {
         
-        let columnsTwo = [
+        let columns = [
+            GridItem(.flexible(maximum: 55), alignment: .leading),
             GridItem(.flexible(), alignment: .leading),
             GridItem(.flexible(), alignment: .trailing),
         ]
         
         VStack {
         
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
+            LazyVGrid(columns: columns, spacing: 30) {
                 scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.description)
                 scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
-            }
-
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
                 scoreUnit(text: "Time", icon: "clock", value: gameModel.seconds.formattedAsTime)
                 scoreUnit(text: "Sum", icon: "sum", value: gameModel.totalScore.formatted())
-            }
-                   
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
-            
                 scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameModel.undosUsed.formatted())
-                scoreUnit(text:"+4s", icon: "4.circle", value: gameModel.manual4sUsed.formatted())
+                scoreUnit(text:"+4s", icon: "die.face.4", value: gameModel.manual4sUsed.formatted())
             }
-            
-            Divider()
         }
+        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
+        .lineLimit(1)             // keep it on one line
         .padding()
 
     }
     
     @ViewBuilder private func scoreUnit(text: String, icon: String, value: String) -> some View {
-        HStack {
-            Label("\(text):", systemImage: icon)
-                .font(.system(size: 18, weight: .bold))
+        Group {
+            Image(systemName: icon)
+                .font(.system(size: 38, weight: .bold))
+            Text("\(text):")
+                .font(.system(size: 38, weight: .bold))
             Text(value)
-                .font(.system(size: 18, weight: .regular))
+                .font(.system(size: 38, weight: .regular))
         }
-        .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
-        .lineLimit(1)             // keep it on one line
 
     }
 
     @ViewBuilder private var gameButtonsView: some View {
         HStack(spacing: 10) {
-            undoButton
-            addFourButton
-            Spacer()
+            settingsButton
             newButton
+            Spacer()
+            addFourButton
+            undoButton
         }
         .padding()
     }
@@ -148,18 +140,21 @@ struct ContentView: View {
                 case .down:  gameModel.move(.down)
                 }
             })
-            .gesture(
-                DragGesture(minimumDistance: 20)
-                    .onEnded { value in
-                        let horizontal = value.translation.width
-                        let vertical = value.translation.height
-                        let direction: Direction = (abs(horizontal) > abs(vertical)) ?
-                        (horizontal > 0 ? .right : .left) :
-                        (vertical > 0 ? .down : .up)
-                        gameModel.move(direction)
-                    }
-            )
-            
+            .focusable(true) // Enable focus for tvOS
+            .onMoveCommand { direction in
+                switch direction {
+                case .left:
+                    gameModel.move(.left)
+                case .right:
+                    gameModel.move(.right)
+                case .up:
+                    gameModel.move(.up)
+                case .down:
+                    gameModel.move(.down)
+                default:
+                    break
+                }
+            }
         }
         .aspectRatio(1, contentMode: .fit)
         .padding()
@@ -173,7 +168,6 @@ struct ContentView: View {
         } label: {
             Image(systemName: "gear")
         }
-        .keyboardShortcut(",", modifiers: [.command])
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
@@ -182,8 +176,8 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            maxHeight: 55,
-            minWidth: 55
+            maxHeight: 80,
+            minWidth: 80
         )
     }
     
@@ -191,7 +185,6 @@ struct ContentView: View {
         Button(action: { showAlert = true }) {
             Image(systemName: "plus.circle")
         }
-        .keyboardShortcut("n", modifiers: [.command])
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
@@ -200,8 +193,8 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            maxHeight: 55,
-            minWidth: 55
+            maxHeight: 80,
+            minWidth: 80
         )
         .alert(isPresented: $showAlert) {
             Alert(
@@ -227,10 +220,9 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            maxHeight: 55,
-            minWidth: 55
+            maxHeight: 80,
+            minWidth: 80
         )
-        .keyboardShortcut("z", modifiers: [.command])
     }
     
     @ViewBuilder private var addFourButton: some View {
@@ -245,10 +237,9 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            maxHeight: 55,
-            minWidth: 55
+            maxHeight: 80,
+            minWidth: 80
         )
-        .keyboardShortcut("4", modifiers: [.command])
     }
 
 }
