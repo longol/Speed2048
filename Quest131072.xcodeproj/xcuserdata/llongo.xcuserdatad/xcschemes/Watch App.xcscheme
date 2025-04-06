@@ -81,6 +81,15 @@
             ReferencedContainer = "container:Quest131072.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A8551C662DA19C3700D96AAD"
+            BuildableName = "Quest131072Watch Watch App.app"
+            BlueprintName = "Quest131072Watch Watch App"
+            ReferencedContainer = "container:Quest131072.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

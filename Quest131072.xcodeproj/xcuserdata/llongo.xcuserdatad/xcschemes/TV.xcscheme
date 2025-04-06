@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A8551C822DA1A06700D96AAD"
+               BlueprintIdentifier = "A819A6622DA1EA2E0064340E"
                BuildableName = "Quest131072TV.app"
                BlueprintName = "Quest131072TV"
                ReferencedContainer = "container:Quest131072.xcodeproj">
@@ -44,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A8551C822DA1A06700D96AAD"
+            BlueprintIdentifier = "A819A6622DA1EA2E0064340E"
             BuildableName = "Quest131072TV.app"
             BlueprintName = "Quest131072TV"
             ReferencedContainer = "container:Quest131072.xcodeproj">
@@ -61,7 +61,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A8551C822DA1A06700D96AAD"
+            BlueprintIdentifier = "A819A6622DA1EA2E0064340E"
             BuildableName = "Quest131072TV.app"
             BlueprintName = "Quest131072TV"
             ReferencedContainer = "container:Quest131072.xcodeproj">
@@ -70,7 +70,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A8551C822DA1A06700D96AAD"
+            BlueprintIdentifier = "A819A6622DA1EA2E0064340E"
             BuildableName = "Quest131072TV.app"
             BlueprintName = "Quest131072TV"
             ReferencedContainer = "container:Quest131072.xcodeproj">
