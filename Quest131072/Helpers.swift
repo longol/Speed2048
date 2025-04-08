@@ -27,8 +27,6 @@ struct GameState: Codable {
     let undoStack: [[Tile]]
     let gameLevel: GameLevel
     let fastAnimations: Bool
-    let totalScore: Int
-    let cheatsUsed: Int
     let undosUsed: Int
     let manual4sUsed: Int
 }

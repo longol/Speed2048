@@ -8,7 +8,6 @@ import AppKit
 /// The main game view.
 struct ContentView: View {
     @StateObject var gameModel: GameViewModel
-//    @Environment(\.scenePhase) var scenePhase
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
@@ -17,35 +16,36 @@ struct ContentView: View {
     let cellSize: CGFloat = 80
     
     var body: some View {
-        VStack(alignment: .center, spacing: 0) {
-            headerView
-            scoresView
-            Spacer()
-            gameButtonsView
-            gameBoardView
-            
-        }
-        #if os(macOS)
-        .frame(minWidth: 400, minHeight: 500)
-        #endif
-        .dynamicTypeSize(.xSmall ... .xxxLarge)
-        .sheet(isPresented: $showSettings) {
-            SettingsView(gameModel: gameModel)
-        }
-        .alert(isPresented: $gameModel.showVersionChoiceAlert) {
-            Alert(
-                title: Text("Cloud Game Found"),
-                message: Text("Cloud game with higher score found. Use it or use your local version?"),
-                primaryButton: .default(Text("Use Cloud")) {
-                    gameModel.applyVersionChoice(useCloud: true)
-                },
-                secondaryButton: .destructive(Text("Use Local")) {
-                    gameModel.applyVersionChoice(useCloud: false)
-                }
-            )
-        }
-        .onDisappear {
-            gameModel.saveGameState()
+        ZStack {
+            VStack(alignment: .center, spacing: 0) {
+                headerView
+                scoresView
+                Spacer()
+                gameButtonsView
+                gameBoardView
+            }
+            #if os(macOS)
+            .frame(minWidth: 400, minHeight: 500)
+            #endif
+            .dynamicTypeSize(.xSmall ... .xxxLarge)
+            .sheet(isPresented: $showSettings) {
+                SettingsView(gameModel: gameModel)
+            }
+            .alert(isPresented: $gameModel.showVersionChoiceAlert) {
+                Alert(
+                    title: Text("Cloud Game Found"),
+                    message: Text("Cloud game with higher score found. Use it or use your local version?"),
+                    primaryButton: .default(Text("Use Cloud")) {
+                        gameModel.applyVersionChoice(useCloud: true)
+                    },
+                    secondaryButton: .destructive(Text("Use Local")) {
+                        gameModel.applyVersionChoice(useCloud: false)
+                    }
+                )
+            }
+            .onDisappear {
+                gameModel.saveGameState()
+            }
         }
     }
         
@@ -62,6 +62,25 @@ struct ContentView: View {
         .padding()
     }
    
+    @ViewBuilder private var gameButtonsView: some View {
+        HStack(spacing: 10) {
+            if gameModel.cloud.loading {
+                Spacer()
+                loadMessage
+                Spacer()
+            } else {
+                undoButton
+                addFourButton
+                Spacer()
+                loadButton
+                saveButton
+                Spacer()
+                newButton
+            }
+        }
+        .padding()
+    }
+
     @ViewBuilder private var scoresView: some View {
         
         let columnsTwo = [
@@ -105,15 +124,6 @@ struct ContentView: View {
 
     }
 
-    @ViewBuilder private var gameButtonsView: some View {
-        HStack(spacing: 10) {
-            undoButton
-            addFourButton
-            Spacer()
-            newButton
-        }
-        .padding()
-    }
 
     @ViewBuilder private var gameBoardView: some View {
         GeometryReader { geo in
@@ -250,6 +260,76 @@ struct ContentView: View {
         )
         .keyboardShortcut("4", modifiers: [.command])
     }
+    
+    @ViewBuilder private var saveButton: some View {
+        
+        Button {
+            gameModel.saveGameState()
+        } label: {
+            Image(systemName: "icloud.and.arrow.up")
+        }
+        .disabled(gameModel.cloud.loading)
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(
+                    colors: [2048.colorForValue, 8192.colorForValue]
+                ),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            maxHeight: 55,
+            minWidth: 55
+        )
+        .keyboardShortcut("s", modifiers: [.command])
+        
+    }
+    
+    @ViewBuilder private var loadButton: some View {
+        
+        Button {
+            gameModel.applyVersionChoice(useCloud: true)
+        } label: {
+            Image(systemName: "icloud.and.arrow.down")
+        }
+        .disabled(gameModel.cloud.loading)
+        .gameButtonStyle(
+            gradient: LinearGradient(
+                gradient: Gradient(
+                    colors: [2048.colorForValue, 8192.colorForValue]
+                ),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            maxHeight: 55,
+            minWidth: 55
+        )
+        .keyboardShortcut("o", modifiers: [.command])
+    }
 
+    @ViewBuilder private var loadMessage: some View {
+        if gameModel.cloud.loading {
+            Button {
+                print("nothing to see here")
+            } label: {
+                Label(gameModel.cloud.message, systemImage: "bolt.horizontal.icloud")
+                ProgressView()
+                    .scaleEffect(0.5)
+            }
+            .gameButtonStyle(
+                gradient: LinearGradient(
+                    gradient: Gradient(
+                        colors: [2048.colorForValue, 8192.colorForValue]
+                    ),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                minWidth: 300,
+                fontSize: 18
+            )
+
+        } else {
+            EmptyView()
+        }
+    }
 }
 

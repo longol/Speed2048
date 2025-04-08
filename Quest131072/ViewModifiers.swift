@@ -11,10 +11,11 @@ struct GameButtonModifier: ViewModifier {
     let gradient: LinearGradient
     let maxHeight: CGFloat
     let minWidth: CGFloat
+    let fontSize: CGFloat
     
     func body(content: Content) -> some View {
         content
-            .font(.system(size: 32, weight: .bold))
+            .font(.system(size: fontSize, weight: .bold))
             .padding()
             .frame(minWidth: minWidth, maxHeight: maxHeight)
             .background(gradient)
@@ -27,12 +28,13 @@ struct GameButtonModifier: ViewModifier {
 
 
 extension View {
-    func gameButtonStyle(gradient: LinearGradient, maxHeight: Double = 55, minWidth: CGFloat = 100) -> some View {
+    func gameButtonStyle(gradient: LinearGradient, maxHeight: Double = 55, minWidth: CGFloat = 100, fontSize:CGFloat = 32,) -> some View {
         self.modifier(
             GameButtonModifier(
                 gradient: gradient,
                 maxHeight: maxHeight,
-                minWidth: minWidth
+                minWidth: minWidth,
+                fontSize: fontSize
             )
         )
     }
