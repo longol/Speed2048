@@ -16,7 +16,7 @@ class GameViewModel: ObservableObject {
     @Published var gameLevel: GameLevel = .regular
     @Published var fastAnimations: Bool = false
     @Published var tiles: [Tile] = []
-    
+    @Published var undoStack: [[Tile]] = []
     @Published var undosUsed: Int = 0
     @Published var manual4sUsed: Int = 0
     
@@ -42,7 +42,7 @@ class GameViewModel: ObservableObject {
     
     // MARK: Game Mechanics
     private var isAnimating: Bool = false
-    private var undoStack: [[Tile]] = []
+    
     private var timer: Timer? = nil
 
     // MARK: CloudKit and Data Management
@@ -62,7 +62,7 @@ class GameViewModel: ObservableObject {
     var fetchedCloudGameState: GameState? = nil
     
     init() {
-        checkCloudVersion()
+//        checkCloudVersion()
     }
 
     // MARK: GAME MECHANICS
@@ -291,46 +291,75 @@ class GameViewModel: ObservableObject {
 
     // MARK: DATA MANAGEMENT
     func checkCloudVersion() {
-        
         loadGameStateLocally()
-        
+
         cloud.loading = true
         cloud.message = "Checking cloud"
-        
+
+        fetchGameStateFromCloud { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let cloudState):
+                    self.cloud.message = "Comparing scores"
+                    print("Comparing scores")
+
+                    // Compare scores and decide action
+                    let cloudTotalScore = cloudState.tiles.reduce(0) { $0 + $1.value }
+                    
+                    if cloudTotalScore > self.totalScore {
+                        // Cloud version has a higher score, prompt the user
+                        self.fetchedCloudGameState = cloudState
+                        self.showVersionChoiceAlert = true
+                        self.cloud.message = "Which one do you want?"
+                        print("Which one do you want?")
+                    } else {
+                        self.cloud.message = "Game up to date"
+                        print("Game up to date")
+                    }
+                case .failure(let error):
+                    if let ckError = error as? CKError, ckError.code == .notAuthenticated {
+                        self.cloud.message = "iCloud account not set up"
+                        print("iCloud account not set up")
+                    } else {
+                        self.cloud.message = "Cloud load failed"
+                        print("Cloud load failed: \(error.localizedDescription)")
+                    }
+                }
+
+                self.resetCloudMessage()
+            }
+        }
+    }
+
+    func fetchGameStateFromCloud(completion: @escaping (Result<GameState, Error>) -> Void) {
+        cloud.loading = true
+        cloud.message = "Fetching cloud data"
+
         privateDatabase.fetch(withRecordID: recordID) { (record, error) in
             DispatchQueue.main.async {
+                if let error = error as? CKError, error.code == .notAuthenticated {
+                    completion(.failure(NSError(domain: "GameViewModel", code: 3, userInfo: [NSLocalizedDescriptionKey: "iCloud account not set up"])))
+                    return
+                }
+
                 if let record = record,
                    let asset = record["stateAsset"] as? CKAsset,
                    let fileURL = asset.fileURL {
                     do {
-                        self.cloud.message = "Reading cloud data"
-                        
                         let data = try Data(contentsOf: fileURL)
                         if let cloudState = try? JSONDecoder().decode(GameState.self, from: data) {
-                            self.cloud.message = "Comparing dates"
-                            // Compare scores and decide action
-                            let cloudTotalScore = cloudState.tiles.reduce(0) { $0 + $1.value }
-                            if cloudTotalScore > self.totalScore {
-                                // Cloud version has a higher score, prompt the user
-                                self.fetchedCloudGameState = cloudState
-                                self.showVersionChoiceAlert = true
-                                self.cloud.message = "Cloud loaded"
-                            } else {
-                                self.cloud.message = "Local game is up to date"
-                            }
+                            completion(.success(cloudState))
+                        } else {
+                            completion(.failure(NSError(domain: "GameViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to decode cloud game state"])))
                         }
                     } catch {
-                        print("Failed to load cloud game state: \(error.localizedDescription)")
-                        self.cloud.message = "Cloud game state failed"
+                        completion(.failure(error))
                     }
                 } else {
-                    // No cloud state found or fetch failed, save the current game
-                    print("Failed to find cloud stateAsset: \(error?.localizedDescription ?? "unknown error")")
-                    self.cloud.message = "Cloud asset not found"
+                    completion(.failure(error ?? NSError(domain: "GameViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch cloud record"])))
                 }
 
                 self.resetCloudMessage()
-
             }
         }
     }
@@ -340,7 +369,7 @@ class GameViewModel: ObservableObject {
             applyGameState(cloudGameState)
 
             cloud.loading = true
-            cloud.message = "Loading from cloud"
+            cloud.message = "Loading cloud"
             resetCloudMessage()
         }
         // Reset temporary variables.
@@ -375,12 +404,14 @@ class GameViewModel: ObservableObject {
                 self.manual4sUsed = gameState.manual4sUsed
 
                 if !tiles.isEmpty { startTimer() } // Start the timer only if there is an active game
-                print("Game state loaded from LOCAL")
+//                self.cloud.message = "Local game loaded"
+//                print("Local game loaded")
             } else {
                 newGame() // If decoding fails, start a new game
             }
         } catch {
-            print("No saved game state found, starting a new game.")
+            self.cloud.message = "Starting new game"
+            print("Starting new game")
             newGame() // If no saved state exists, start a new game
         }
     }
@@ -423,13 +454,15 @@ class GameViewModel: ObservableObject {
                         DispatchQueue.main.async { // Ensure updates happen on the main thread
                             if let saveError = saveError as? CKError, saveError.code == .serverRecordChanged {
                                 self.cloud.message = "Resolving conflict"
+                                print("Resolving conflict")
                                 self.resolveCloudConflict(tempFileURL: tempFileURL)
-                            } else if let saveError = saveError {
-                                print("Failed to save to CloudKit: \(saveError.localizedDescription)")
+                            } else if saveError != nil {
                                 self.cloud.message = "Not saved to cloud"
+                                print("Not saved to cloud: \(error?.localizedDescription ?? "empty error")")
                                 self.saveGameStateLocally(gameState: gameState)
                             } else {
                                 self.cloud.message = "Saved to cloud"
+                                print("Saved to cloud")
                             }
                         }
                         
@@ -441,8 +474,8 @@ class GameViewModel: ObservableObject {
             }
             
         } catch {
-            print("Failed to encode game state: \(error.localizedDescription)")
             self.cloud.message = "Game encoding failed"
+            print("Game encoding failed")
         }
         
     }
@@ -452,6 +485,7 @@ class GameViewModel: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { // Ensure updates happen on the main thread
                 self.cloud.loading = false
                 self.cloud.message = ""
+                print("")
             }
         }
     }
@@ -464,8 +498,8 @@ class GameViewModel: ObservableObject {
         privateDatabase.fetch(withRecordID: recordID) { (latestRecord, fetchError) in
             DispatchQueue.main.async { // Ensure updates happen on the main thread
                 guard let latestRecord = latestRecord, fetchError == nil else {
-                    print("Failed to fetch latest record for conflict resolution: \(fetchError?.localizedDescription ?? "Unknown error")")
                     self.cloud.message = "Conflict resolution failed"
+                    print("Conflict resolution failed: \(fetchError?.localizedDescription ?? "empty error")")
                     self.resetCloudMessage()
                     return
                 }
@@ -474,12 +508,12 @@ class GameViewModel: ObservableObject {
 
                 self.privateDatabase.save(latestRecord) { (savedRecord, saveError) in
                     DispatchQueue.main.async { // Ensure updates happen on the main thread
-                        if let saveError = saveError {
-                            print("Failed to resolve conflict and save to CloudKit: \(saveError.localizedDescription)")
-                            self.cloud.message = "Conflict resolution and cloud save failed"
+                        if saveError != nil {
+                            self.cloud.message = "Conflict and cloud failed"
+                            print("Conflict and cloud failed: \(saveError?.localizedDescription ?? "empty error")")
                         } else {
-                            print("Conflict resolved and game state saved to CloudKit")
-                            self.cloud.message = "Saved to cloud after conflict resolution"
+                            self.cloud.message = "Cloud and conflict resolved"
+                            print("Cloud and conflict resolved")
                         }
                         
                         self.resetCloudMessage()
@@ -497,9 +531,11 @@ class GameViewModel: ObservableObject {
         if let data = try? JSONEncoder().encode(gameState) {
             do {
                 try data.write(to: gameStateFileURL, options: .atomic)
-                print("Game state saved LOCAL")
+                self.cloud.message = "Local save ok"
+                print("Local save ok")
             } catch {
-                print("Failed to save game state: \(error.localizedDescription)")
+                self.cloud.message = "Local save failed"
+                print("Local save failed")
             }
         }
     }

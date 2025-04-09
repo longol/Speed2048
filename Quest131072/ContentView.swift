@@ -7,7 +7,7 @@ import AppKit
 
 /// The main game view.
 struct ContentView: View {
-    @StateObject var gameModel: GameViewModel
+    @ObservedObject var gameModel: GameViewModel
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
@@ -16,36 +16,22 @@ struct ContentView: View {
     let cellSize: CGFloat = 80
     
     var body: some View {
-        ZStack {
-            VStack(alignment: .center, spacing: 0) {
-                headerView
-                scoresView
-                Spacer()
-                gameButtonsView
-                gameBoardView
-            }
-            #if os(macOS)
-            .frame(minWidth: 400, minHeight: 500)
-            #endif
-            .dynamicTypeSize(.xSmall ... .xxxLarge)
-            .sheet(isPresented: $showSettings) {
-                SettingsView(gameModel: gameModel)
-            }
-            .alert(isPresented: $gameModel.showVersionChoiceAlert) {
-                Alert(
-                    title: Text("Cloud Game Found"),
-                    message: Text("Cloud game with higher score found. Use it or use your local version?"),
-                    primaryButton: .default(Text("Use Cloud")) {
-                        gameModel.applyVersionChoice(useCloud: true)
-                    },
-                    secondaryButton: .destructive(Text("Use Local")) {
-                        gameModel.applyVersionChoice(useCloud: false)
-                    }
-                )
-            }
-            .onDisappear {
-                gameModel.saveGameState()
-            }
+        VStack(alignment: .center, spacing: 0) {
+            headerView
+            scoresView
+            Spacer()
+            gameButtonsView
+            gameBoardView
+        }
+        #if os(macOS)
+        .frame(minWidth: 400, minHeight: 500)
+        #endif
+        .dynamicTypeSize(.xSmall ... .xxxLarge)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(gameModel: gameModel)
+        }
+        .onDisappear {
+            gameModel.saveGameState()
         }
     }
         
@@ -60,6 +46,18 @@ struct ContentView: View {
             settingsButton
         }
         .padding()
+        .alert(isPresented: $gameModel.showVersionChoiceAlert) {
+            Alert(
+                title: Text("Cloud Game Found"),
+                message: Text("Cloud game with higher score found. Use it or use your local version?"),
+                primaryButton: .default(Text("Use Cloud")) {
+                    gameModel.applyVersionChoice(useCloud: true)
+                },
+                secondaryButton: .destructive(Text("Use Local")) {
+                    gameModel.applyVersionChoice(useCloud: false)
+                }
+            )
+        }
     }
    
     @ViewBuilder private var gameButtonsView: some View {
@@ -198,7 +196,10 @@ struct ContentView: View {
     }
     
     @ViewBuilder private var newButton: some View {
-        Button(action: { showAlert = true }) {
+        Button(action: {
+            showAlert = true
+            gameModel.stopTimer()
+        }) {
             Image(systemName: "plus.circle")
         }
         .keyboardShortcut("n", modifiers: [.command])
@@ -217,12 +218,21 @@ struct ContentView: View {
             Alert(
                 title: Text("Start New Game"),
                 message: Text("Are you sure you want to start a new game?"),
-                primaryButton: .destructive(Text("Start")) {
-                    gameModel.newGame()
-                },
-                secondaryButton: .cancel()
+                primaryButton: .default(
+                    Text("Cancel"),
+                    action: gameModel.startTimer
+                ),
+                secondaryButton: .destructive(
+                    Text("New Game"),
+                    action: gameModel.newGame
+                )
             )
         }
+        .onChange(of: showAlert, { oldValue, newValue in
+            if !newValue {
+                gameModel.startTimer() // Restart the timer when the alert is dismissed
+            }
+        })
     }
      
     @ViewBuilder private var undoButton: some View {

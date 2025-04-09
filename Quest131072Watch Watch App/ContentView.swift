@@ -2,24 +2,25 @@ import SwiftUI
 /// The main game view.
 struct ContentView: View {
     @StateObject var gameModel: GameViewModel
-    
-    @State private var showAlert = false
-    @State private var showSettings: Bool = false
-    
+
+    @State private var showScoreView = false // State to control ScoreView presentation
+
     let boardDimension: CGFloat = 4
     let cellSize: CGFloat = 80
     
     var body: some View {
-        ZStack {
-            VStack(alignment: .center, spacing: 0) {
-                gameBoardView
-            }
-            .onDisappear {
-                gameModel.saveGameState()
-            }
+        VStack(alignment: .center, spacing: 0) {
+            gameBoardView
+        }
+        .dynamicTypeSize(.xSmall ... .xxxLarge)
+        .onDisappear {
+            gameModel.saveGameState()
+        }
+        .sheet(isPresented: $showScoreView) {
+            ScoreView(gameModel: gameModel) // Present the ScoreView
         }
     }
-    
+        
     @ViewBuilder private var gameBoardView: some View {
         GeometryReader { geo in
             let side = geo.size.width
@@ -45,14 +46,6 @@ struct ContentView: View {
             .frame(width: side, height: side)
             .background(Color.gray.opacity(0.3))
             .cornerRadius(8)
-            .background(KeyEventHandlingView { key in
-                switch key {
-                case .left:  gameModel.move(.left)
-                case .right: gameModel.move(.right)
-                case .up:    gameModel.move(.up)
-                case .down:  gameModel.move(.down)
-                }
-            })
             .gesture(
                 DragGesture(minimumDistance: 20)
                     .onEnded { value in
@@ -64,11 +57,17 @@ struct ContentView: View {
                         gameModel.move(direction)
                     }
             )
+            .gesture(
+                TapGesture()
+                    .onEnded {
+                        showScoreView = true // Open the ScoreView when tapped
+                    }
+            )
+
             
         }
         .aspectRatio(1, contentMode: .fit)
-        .padding()
         .layoutPriority(1)  // ensure the game board isn't squeezed by other views
     }
-    
 }
+

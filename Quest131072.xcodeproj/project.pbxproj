@@ -6,20 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		A884DAD62DA4B03F00192316 /* Quest131072Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A884DACC2DA4B03E00192316 /* Quest131072Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		A884DAD42DA4B03F00192316 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A85FA92B2D9CE3A800959E76 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A884DACB2DA4B03E00192316;
-			remoteInfo = "Quest131072Watch Watch App";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		A826EE452D9DA3BE00AD2E5F /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -27,7 +13,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				A884DAD62DA4B03F00192316 /* Quest131072Watch Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -36,7 +21,7 @@
 
 /* Begin PBXFileReference section */
 		A85FA9332D9CE3A800959E76 /* Quest131072.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quest131072.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A884DACC2DA4B03E00192316 /* Quest131072Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quest131072Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quest131072Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,15 +32,16 @@
 			};
 			target = A85FA9322D9CE3A800959E76 /* Quest131072 */;
 		};
-		A884DADE2DA4B07400192316 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */ = {
+		A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Extensions.swift,
 				GameViewModel.swift,
 				Helpers.swift,
 				TileModelView.swift,
+				ViewModifiers.swift,
 			);
-			target = A884DACB2DA4B03E00192316 /* Quest131072Watch Watch App */;
+			target = A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -64,12 +50,12 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A8551C7E2DA19F9E00D96AAD /* Exceptions for "Quest131072" folder in "Quest131072" target */,
-				A884DADE2DA4B07400192316 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */,
+				A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */,
 			);
 			path = Quest131072;
 			sourceTree = "<group>";
 		};
-		A884DACD2DA4B03E00192316 /* Quest131072Watch Watch App */ = {
+		A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Quest131072Watch Watch App";
 			sourceTree = "<group>";
@@ -84,7 +70,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A884DAC92DA4B03E00192316 /* Frameworks */ = {
+		A8C37A2C2DA5D35100A76CCD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -98,7 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				A85FA9352D9CE3A800959E76 /* Quest131072 */,
-				A884DACD2DA4B03E00192316 /* Quest131072Watch Watch App */,
+				A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */,
 				A85FA9342D9CE3A800959E76 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,7 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				A85FA9332D9CE3A800959E76 /* Quest131072.app */,
-				A884DACC2DA4B03E00192316 /* Quest131072Watch Watch App.app */,
+				A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -127,7 +113,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				A884DAD52DA4B03F00192316 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A85FA9352D9CE3A800959E76 /* Quest131072 */,
@@ -139,26 +124,26 @@
 			productReference = A85FA9332D9CE3A800959E76 /* Quest131072.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A884DACB2DA4B03E00192316 /* Quest131072Watch Watch App */ = {
+		A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A884DAD92DA4B03F00192316 /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */;
+			buildConfigurationList = A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */;
 			buildPhases = (
-				A884DAC82DA4B03E00192316 /* Sources */,
-				A884DAC92DA4B03E00192316 /* Frameworks */,
-				A884DACA2DA4B03E00192316 /* Resources */,
+				A8C37A2B2DA5D35100A76CCD /* Sources */,
+				A8C37A2C2DA5D35100A76CCD /* Frameworks */,
+				A8C37A2D2DA5D35100A76CCD /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A884DACD2DA4B03E00192316 /* Quest131072Watch Watch App */,
+				A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */,
 			);
 			name = "Quest131072Watch Watch App";
 			packageProductDependencies = (
 			);
 			productName = "Quest131072Watch Watch App";
-			productReference = A884DACC2DA4B03E00192316 /* Quest131072Watch Watch App.app */;
+			productReference = A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -174,7 +159,7 @@
 					A85FA9322D9CE3A800959E76 = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					A884DACB2DA4B03E00192316 = {
+					A8C37A2E2DA5D35100A76CCD = {
 						CreatedOnToolsVersion = 16.3;
 					};
 				};
@@ -194,7 +179,7 @@
 			projectRoot = "";
 			targets = (
 				A85FA9322D9CE3A800959E76 /* Quest131072 */,
-				A884DACB2DA4B03E00192316 /* Quest131072Watch Watch App */,
+				A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -207,7 +192,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A884DACA2DA4B03E00192316 /* Resources */ = {
+		A8C37A2D2DA5D35100A76CCD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -224,7 +209,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A884DAC82DA4B03E00192316 /* Sources */ = {
+		A8C37A2B2DA5D35100A76CCD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,14 +217,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		A884DAD52DA4B03F00192316 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A884DACB2DA4B03E00192316 /* Quest131072Watch Watch App */;
-			targetProxy = A884DAD42DA4B03F00192316 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A85FA9402D9CE3A900959E76 /* Debug */ = {
@@ -448,24 +425,26 @@
 			};
 			name = Release;
 		};
-		A884DAD72DA4B03F00192316 /* Debug */ = {
+		A8C37A3B2DA5D35200A76CCD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Quest131072Watch Watch App/Quest131072Watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Quest131072Watch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.lucaslongo.Quest131072;
+				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072Watch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -476,24 +455,26 @@
 			};
 			name = Debug;
 		};
-		A884DAD82DA4B03F00192316 /* Release */ = {
+		A8C37A3C2DA5D35200A76CCD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Quest131072Watch Watch App/Quest131072Watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Quest131072Watch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.lucaslongo.Quest131072;
+				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072Watch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -526,11 +507,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A884DAD92DA4B03F00192316 /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */ = {
+		A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A884DAD72DA4B03F00192316 /* Debug */,
-				A884DAD82DA4B03F00192316 /* Release */,
+				A8C37A3B2DA5D35200A76CCD /* Debug */,
+				A8C37A3C2DA5D35200A76CCD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
