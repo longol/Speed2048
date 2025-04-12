@@ -25,6 +25,10 @@ struct SettingsView: View {
             
             Divider()
             
+            cloudSyncSection // Added cloud sync section
+            
+            Divider()
+            
             perfectBoardButton
             
             Spacer()
@@ -84,6 +88,43 @@ struct SettingsView: View {
             Toggle(isOn: $gameModel.fastAnimations) {
                 Label("Fast animations?", systemImage: "hare")
             }
+        }
+    }
+    
+    @ViewBuilder private var cloudSyncSection: some View {
+        VStack(alignment: .leading) {
+            Text("Cloud Sync").bold()
+            HStack {
+                Button {
+                    gameModel.saveGameState()
+                } label: {
+                    Label("Save Game to Cloud", systemImage: "icloud.and.arrow.up")
+                }
+                .buttonStyle(.bordered)
+                .disabled(!gameModel.statusMessage.isEmpty)
+
+                Button {
+                    gameModel.applyVersionChoice(useCloud: true)
+                } label: {
+                    Label("Load Game from Cloud", systemImage: "icloud.and.arrow.down")
+                }
+                .buttonStyle(.bordered)
+                .disabled(!gameModel.statusMessage.isEmpty)
+            }
+            HStack {
+                if !gameModel.statusMessage.isEmpty {
+                    Label(gameModel.statusMessage, systemImage: "bolt.horizontal.icloud")
+                    ProgressView()
+                        .scaleEffect(0.5)
+                } else {
+                    Text("Save or load your game progress using iCloud.")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.gray)
+            .frame(height: 20)
+
+
         }
     }
     

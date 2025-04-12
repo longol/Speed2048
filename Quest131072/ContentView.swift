@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var showAlert = false
     @State private var showSettings: Bool = false
     
+    @State private var undoTimer: Timer?
+    
     let boardDimension: CGFloat = 4
     let cellSize: CGFloat = 80
     
@@ -20,12 +22,13 @@ struct ContentView: View {
             headerView
             scoresView
             Spacer()
+            statusMessage
             gameButtonsView
             gameBoardView
         }
-        #if os(macOS)
+#if os(macOS)
         .frame(minWidth: 400, minHeight: 500)
-        #endif
+#endif
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .sheet(isPresented: $showSettings) {
             SettingsView(gameModel: gameModel)
@@ -34,7 +37,7 @@ struct ContentView: View {
             gameModel.saveGameState()
         }
     }
-        
+    
     @ViewBuilder private var headerView: some View {
         HStack {
             Text("Quest for 131072")
@@ -42,7 +45,7 @@ struct ContentView: View {
                 .bold()
             
             Spacer()
-
+            
             settingsButton
         }
         .padding()
@@ -59,55 +62,41 @@ struct ContentView: View {
             )
         }
     }
-   
-    @ViewBuilder private var gameButtonsView: some View {
-        HStack(spacing: 10) {
-            if gameModel.cloud.loading {
-                Spacer()
-                loadMessage
-                Spacer()
-            } else {
-                undoButton
-                addFourButton
-                Spacer()
-                loadButton
-                saveButton
-                Spacer()
-                newButton
-            }
-        }
-        .padding()
-    }
-
+    
     @ViewBuilder private var scoresView: some View {
         
         let columnsTwo = [
             GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .trailing),
+            GridItem(.flexible(), alignment: .leading),
         ]
         
+        let columnsOne = [
+            GridItem(.flexible(), alignment: .leading),
+            GridItem(.flexible(), alignment: .leading),
+        ]
+
         VStack {
-        
+            
             LazyVGrid(columns: columnsTwo, spacing: 10) {
                 scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.description)
-                scoreUnit(text:"Goal", icon: "flag.pattern.checkered", value: (2 * (gameModel.tiles.map { $0.value }.max() ?? 0)).formatted())
-            }
-
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
-                scoreUnit(text: "Time", icon: "clock", value: gameModel.seconds.formattedAsTime)
                 scoreUnit(text: "Sum", icon: "sum", value: gameModel.totalScore.formatted())
             }
-                   
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
             
+            LazyVGrid(columns: columnsTwo, spacing: 10) {
+                
                 scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameModel.undosUsed.formatted())
                 scoreUnit(text:"+4s", icon: "4.circle", value: gameModel.manual4sUsed.formatted())
             }
             
-            Divider()
+            LazyVGrid(columns: columnsOne, spacing: 10) {
+                Label("Time:", systemImage: "clock")
+                    .font(.system(size: 18, weight: .bold))
+                Text(gameModel.seconds.formattedAsTime)
+                    .font(.system(size: 18, weight: .regular))
+            }
         }
         .padding()
-
+        
     }
     
     @ViewBuilder private func scoreUnit(text: String, icon: String, value: String) -> some View {
@@ -119,9 +108,40 @@ struct ContentView: View {
         }
         .minimumScaleFactor(0.5)  // allow text to shrink to 50% of its size
         .lineLimit(1)             // keep it on one line
-
+        
+    }
+    
+    @ViewBuilder private var statusMessage: some View {
+        HStack {
+            if !gameModel.statusMessage.isEmpty {
+                Label(gameModel.statusMessage, systemImage: "bolt.horizontal.icloud")
+                ProgressView()
+                    .scaleEffect(0.5)
+            } else {
+                EmptyView()
+            }
+        }
+        .font(.callout)
+        .frame(height: 30)
+        .foregroundStyle(.gray.opacity(0.5))
+        .layoutPriority(1)  // ensure the game board isn't squeezed by other views
     }
 
+    @ViewBuilder private var gameButtonsView: some View {
+        VStack(alignment: .center) {
+            HStack {
+                undoButton
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
+                addFourButton
+                Spacer()
+                // loadButton removed
+                // saveButton removed
+                Spacer()
+                newButton
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
+            }
+        }
+    }
 
     @ViewBuilder private var gameBoardView: some View {
         GeometryReader { geo in
@@ -173,7 +193,7 @@ struct ContentView: View {
         .padding()
         .layoutPriority(1)  // ensure the game board isn't squeezed by other views
     }
-
+    
     @ViewBuilder private var settingsButton: some View {
         Button {
             showSettings.toggle()
@@ -234,11 +254,23 @@ struct ContentView: View {
             }
         })
     }
-     
+    
     @ViewBuilder private var undoButton: some View {
         Button(action: { gameModel.undo() }) {
             Image(systemName: "arrow.uturn.backward.circle")
         }
+        .onLongPressGesture(
+            minimumDuration: 0.1, // Adjust the duration for responsiveness
+            pressing: { isPressing in
+                if isPressing {
+                    startUndoTimer()
+                } else {
+                    stopUndoTimer()
+                }
+            },
+            perform: {}
+        )
+        
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
@@ -251,6 +283,7 @@ struct ContentView: View {
             minWidth: 55
         )
         .keyboardShortcut("z", modifiers: [.command])
+        
     }
     
     @ViewBuilder private var addFourButton: some View {
@@ -271,75 +304,17 @@ struct ContentView: View {
         .keyboardShortcut("4", modifiers: [.command])
     }
     
-    @ViewBuilder private var saveButton: some View {
-        
-        Button {
-            gameModel.saveGameState()
-        } label: {
-            Image(systemName: "icloud.and.arrow.up")
+
+    private func startUndoTimer() {
+        stopUndoTimer() // Ensure no existing timer is running
+        undoTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+            gameModel.undo()
         }
-        .disabled(gameModel.cloud.loading)
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [2048.colorForValue, 8192.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 55
-        )
-        .keyboardShortcut("s", modifiers: [.command])
-        
     }
     
-    @ViewBuilder private var loadButton: some View {
-        
-        Button {
-            gameModel.applyVersionChoice(useCloud: true)
-        } label: {
-            Image(systemName: "icloud.and.arrow.down")
-        }
-        .disabled(gameModel.cloud.loading)
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [2048.colorForValue, 8192.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 55
-        )
-        .keyboardShortcut("o", modifiers: [.command])
-    }
-
-    @ViewBuilder private var loadMessage: some View {
-        if gameModel.cloud.loading {
-            Button {
-                print("nothing to see here")
-            } label: {
-                Label(gameModel.cloud.message, systemImage: "bolt.horizontal.icloud")
-                ProgressView()
-                    .scaleEffect(0.5)
-            }
-            .gameButtonStyle(
-                gradient: LinearGradient(
-                    gradient: Gradient(
-                        colors: [2048.colorForValue, 8192.colorForValue]
-                    ),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                minWidth: 300,
-                fontSize: 18
-            )
-
-        } else {
-            EmptyView()
-        }
+    private func stopUndoTimer() {
+        undoTimer?.invalidate()
+        undoTimer = nil
     }
 }
 

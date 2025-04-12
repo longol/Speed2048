@@ -3,12 +3,14 @@ import SwiftUI
 
 extension Int {
     var formattedAsTime: String {
+        let days = self / 3600 * 24
         let hours = self / 3600
         let minutes = (self % 3600) / 60
         let seconds = self % 60
 
         var components: [String] = []
-        if hours > 0 { components.append("\(hours) h : ") }
+        if days > 0 { components.append("\(days) d ") }
+        if hours > 0 { components.append("\(hours) h ") }
         if minutes > 0 { components.append("\(minutes) m") }
         components.append("\(seconds) s")
 
