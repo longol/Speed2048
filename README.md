@@ -1,7 +1,7 @@
-![Quest131072 256](https://github.com/user-attachments/assets/b68642c9-3af1-409a-b4ab-afb9966058f9)
+![Speed2048_256](https://github.com/user-attachments/assets/4f7f4132-fec0-4cbd-b7f7-854d3e8e7e7a)
 
-# The Quest for 131072
-Quest 131072 sets a bold, clear goal: build the ultimate board and achieve the maximum tile—131072. 
+# Speed 2048
+Speed 2048 sets a bold, clear goal: build the ultimate board and achieve the maximum tile—131072. 
 
 It’s no longer just about chasing high scores; it's about strategic perfection and mastering the board.
 
