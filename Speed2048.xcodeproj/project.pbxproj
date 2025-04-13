@@ -20,19 +20,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A85FA9332D9CE3A800959E76 /* Quest131072.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quest131072.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quest131072Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A85FA9332D9CE3A800959E76 /* Speed2048.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speed2048.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8C37A2F2DA5D35100A76CCD /* Speed2048Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Speed2048Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A8551C7E2DA19F9E00D96AAD /* Exceptions for "Quest131072" folder in "Quest131072" target */ = {
+		A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
 				ContentView.swift = (ios, macos, );
 			};
-			target = A85FA9322D9CE3A800959E76 /* Quest131072 */;
+			target = A85FA9322D9CE3A800959E76 /* Speed2048 */;
 		};
-		A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */ = {
+		A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Extensions.swift,
@@ -41,23 +41,23 @@
 				TileModelView.swift,
 				ViewModifiers.swift,
 			);
-			target = A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */;
+			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A85FA9352D9CE3A800959E76 /* Quest131072 */ = {
+		A85FA9352D9CE3A800959E76 /* Speed2048 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A8551C7E2DA19F9E00D96AAD /* Exceptions for "Quest131072" folder in "Quest131072" target */,
-				A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Quest131072" folder in "Quest131072Watch Watch App" target */,
+				A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */,
+				A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */,
 			);
-			path = Quest131072;
+			path = Speed2048;
 			sourceTree = "<group>";
 		};
-		A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */ = {
+		A8C37A332DA5D35100A76CCD /* Speed2048Watch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Quest131072Watch Watch App";
+			path = "Speed2048Watch Watch App";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -83,8 +83,8 @@
 		A85FA92A2D9CE3A800959E76 = {
 			isa = PBXGroup;
 			children = (
-				A85FA9352D9CE3A800959E76 /* Quest131072 */,
-				A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */,
+				A85FA9352D9CE3A800959E76 /* Speed2048 */,
+				A8C37A332DA5D35100A76CCD /* Speed2048Watch Watch App */,
 				A85FA9342D9CE3A800959E76 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -92,8 +92,8 @@
 		A85FA9342D9CE3A800959E76 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A85FA9332D9CE3A800959E76 /* Quest131072.app */,
-				A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */,
+				A85FA9332D9CE3A800959E76 /* Speed2048.app */,
+				A8C37A2F2DA5D35100A76CCD /* Speed2048Watch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,9 +101,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A85FA9322D9CE3A800959E76 /* Quest131072 */ = {
+		A85FA9322D9CE3A800959E76 /* Speed2048 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A85FA9422D9CE3A900959E76 /* Build configuration list for PBXNativeTarget "Quest131072" */;
+			buildConfigurationList = A85FA9422D9CE3A900959E76 /* Build configuration list for PBXNativeTarget "Speed2048" */;
 			buildPhases = (
 				A85FA92F2D9CE3A800959E76 /* Sources */,
 				A85FA9302D9CE3A800959E76 /* Frameworks */,
@@ -115,18 +115,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A85FA9352D9CE3A800959E76 /* Quest131072 */,
+				A85FA9352D9CE3A800959E76 /* Speed2048 */,
 			);
-			name = Quest131072;
+			name = Speed2048;
 			packageProductDependencies = (
 			);
 			productName = Speed2048;
-			productReference = A85FA9332D9CE3A800959E76 /* Quest131072.app */;
+			productReference = A85FA9332D9CE3A800959E76 /* Speed2048.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */ = {
+		A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */;
+			buildConfigurationList = A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Speed2048Watch Watch App" */;
 			buildPhases = (
 				A8C37A2B2DA5D35100A76CCD /* Sources */,
 				A8C37A2C2DA5D35100A76CCD /* Frameworks */,
@@ -137,13 +137,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A8C37A332DA5D35100A76CCD /* Quest131072Watch Watch App */,
+				A8C37A332DA5D35100A76CCD /* Speed2048Watch Watch App */,
 			);
-			name = "Quest131072Watch Watch App";
+			name = "Speed2048Watch Watch App";
 			packageProductDependencies = (
 			);
 			productName = "Quest131072Watch Watch App";
-			productReference = A8C37A2F2DA5D35100A76CCD /* Quest131072Watch Watch App.app */;
+			productReference = A8C37A2F2DA5D35100A76CCD /* Speed2048Watch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -164,7 +164,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A85FA92E2D9CE3A800959E76 /* Build configuration list for PBXProject "Quest131072" */;
+			buildConfigurationList = A85FA92E2D9CE3A800959E76 /* Build configuration list for PBXProject "Speed2048" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -178,8 +178,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A85FA9322D9CE3A800959E76 /* Quest131072 */,
-				A8C37A2E2DA5D35100A76CCD /* Quest131072Watch Watch App */,
+				A85FA9322D9CE3A800959E76 /* Speed2048 */,
+				A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -343,11 +343,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Quest131072/Quest131072.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Speed2048/Speed2048.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Quest131072/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Speed2048/Preview Content\"";
+				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -368,8 +370,9 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -387,11 +390,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Quest131072/Quest131072.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Speed2048/Speed2048.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Quest131072/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Speed2048/Preview Content\"";
+				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -412,8 +417,9 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -430,13 +436,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Quest131072Watch Watch App/Quest131072Watch Watch App.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Speed2048Watch Watch App/Speed2048Watch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Quest131072Watch;
+				INFOPLIST_KEY_CFBundleDisplayName = Speed2048;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -444,8 +451,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072Watch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048Watch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -460,13 +468,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Quest131072Watch Watch App/Quest131072Watch Watch App.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Speed2048Watch Watch App/Speed2048Watch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 49RSWYZQ93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Quest131072Watch;
+				INFOPLIST_KEY_CFBundleDisplayName = Speed2048;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -474,8 +483,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Quest131072Watch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048Watch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -489,7 +499,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A85FA92E2D9CE3A800959E76 /* Build configuration list for PBXProject "Quest131072" */ = {
+		A85FA92E2D9CE3A800959E76 /* Build configuration list for PBXProject "Speed2048" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A85FA9402D9CE3A900959E76 /* Debug */,
@@ -498,7 +508,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A85FA9422D9CE3A900959E76 /* Build configuration list for PBXNativeTarget "Quest131072" */ = {
+		A85FA9422D9CE3A900959E76 /* Build configuration list for PBXNativeTarget "Speed2048" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A85FA9432D9CE3A900959E76 /* Debug */,
@@ -507,7 +517,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Quest131072Watch Watch App" */ = {
+		A8C37A3A2DA5D35200A76CCD /* Build configuration list for PBXNativeTarget "Speed2048Watch Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A8C37A3B2DA5D35200A76CCD /* Debug */,
