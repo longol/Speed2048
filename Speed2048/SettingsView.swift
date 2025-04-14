@@ -10,15 +10,18 @@ struct SettingsView: View {
     @StateObject var gameModel: GameViewModel
     
     var body: some View {
-        
-        VStack(alignment: .leading) {
+        ScrollView {
             
             header
-
+            
             Divider()
-
+            
             gameLevelPicker
             
+            Divider()
+
+            perfectBoardView
+
             Divider()
             
             animationSpeedToggle
@@ -26,12 +29,6 @@ struct SettingsView: View {
             Divider()
             
             cloudSyncSection // Added cloud sync section
-            
-            Divider()
-            
-            perfectBoardButton
-            
-            Spacer()
             
             Divider()
             
@@ -57,7 +54,7 @@ struct SettingsView: View {
     
     @ViewBuilder private var gameLevelPicker: some View {
         VStack(alignment: .leading) {
-
+            
             Text("Game Level").bold()
             
             Picker("Game Level", selection: $gameModel.gameLevel) {
@@ -65,11 +62,11 @@ struct SettingsView: View {
                     Text(level.description).tag(level)
                 }
             }
-            #if os(watchOS)
+#if os(watchOS)
             .pickerStyle(InlinePickerStyle())
-            #else
+#else
             .pickerStyle(SegmentedPickerStyle())
-            #endif
+#endif
             
             HStack {
                 Spacer()
@@ -88,29 +85,36 @@ struct SettingsView: View {
             Toggle(isOn: $gameModel.fastAnimations) {
                 Label("Fast animations?", systemImage: "hare")
             }
+            .padding()
         }
     }
     
     @ViewBuilder private var cloudSyncSection: some View {
-        VStack(alignment: .leading) {
-            Text("Cloud Sync").bold()
+        VStack(alignment: .center) {
             HStack {
+                Text("Cloud Sync").bold()
+                Spacer()
+            }
+            HStack {
+                
                 Button {
                     gameModel.saveGameState()
                 } label: {
                     Label("Save Game to Cloud", systemImage: "icloud.and.arrow.up")
                 }
-                .buttonStyle(.bordered)
-                .disabled(!gameModel.statusMessage.isEmpty)
-
+                .keyboardShortcut("s", modifiers: [.command])
+                
                 Button {
                     gameModel.applyVersionChoice(useCloud: true)
                 } label: {
                     Label("Load Game from Cloud", systemImage: "icloud.and.arrow.down")
                 }
-                .buttonStyle(.bordered)
-                .disabled(!gameModel.statusMessage.isEmpty)
+                .keyboardShortcut("o", modifiers: [.command])
+                
             }
+            .buttonStyle(.borderedProminent)
+            .disabled(!gameModel.statusMessage.isEmpty)
+            
             HStack {
                 if !gameModel.statusMessage.isEmpty {
                     Label(gameModel.statusMessage, systemImage: "bolt.horizontal.icloud")
@@ -123,38 +127,42 @@ struct SettingsView: View {
             .font(.caption)
             .foregroundStyle(.gray)
             .frame(height: 20)
-
-
+            
+            
         }
     }
     
-    @ViewBuilder private var perfectBoardButton: some View {
-        VStack(alignment: .center) {
-            
-            Button(action: {
-                gameModel.setPerfectBoard()
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                Label("Show The Perfect Board!", systemImage: "star.fill")
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
+    @ViewBuilder private var perfectBoardView: some View {
+        HStack {
+            Text("Objective")
+                .bold()
+            Spacer()
         }
-        .padding()
+        HStack {
+            Text("Is it possibel to reach 'The Perfect Board'?")
+                .italic()
+            Spacer()
+        }
+        
+        // Add image called PerfectBoard and make it fit in the view
+        Image("PerfectBoard")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 200, height: 200)    
     }
     
     @ViewBuilder private var contactView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-
-            HStack {
-                Text("Send us your feedback!")
-                Link("Visit site", destination: URL(string: "https://lucaslongo.com/quest131072/")!)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(5)
-            }
+        HStack {
+            Text("Send us your feedback!")
+                .bold()
+            Spacer()
         }
+        
+        Link("Visit site", destination: URL(string: "https://lucaslongo.com/Speed2048/")!)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(5)
     }
 }

@@ -21,11 +21,15 @@ struct ContentView: View {
         VStack(alignment: .center, spacing: 0) {
             headerView
             scoresView
-            Spacer()
             statusMessage
+            Spacer()
             gameButtonsView
             gameBoardView
+            
+            keyboardShortcuts
         }
+        // Removed invalid .keyboardShortcut("s", ...) modifier
+        // Removed invalid .keyboardShortcut("o", ...) modifier
 #if os(macOS)
         .frame(minWidth: 400, minHeight: 500)
 #endif
@@ -38,9 +42,21 @@ struct ContentView: View {
         }
     }
     
+    @ViewBuilder private var keyboardShortcuts: some View {
+        Group {
+            Button("") { gameModel.saveGameState() }
+                .keyboardShortcut("s", modifiers: .command)
+            
+            Button("") { gameModel.checkCloudVersion() }
+                .keyboardShortcut("o", modifiers: .command)
+        }
+        .frame(width: 0, height: 0)
+        .hidden()
+    }
+    
     @ViewBuilder private var headerView: some View {
         HStack {
-            Text("Quest for 131072")
+            Text("Speed 2048")
                 .font(.largeTitle)
                 .bold()
             
@@ -270,7 +286,6 @@ struct ContentView: View {
             },
             perform: {}
         )
-        
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
@@ -280,7 +295,7 @@ struct ContentView: View {
                 endPoint: .bottomTrailing
             ),
             maxHeight: 55,
-            minWidth: 55
+            minWidth: 100
         )
         .keyboardShortcut("z", modifiers: [.command])
         
@@ -299,7 +314,7 @@ struct ContentView: View {
                 endPoint: .bottomTrailing
             ),
             maxHeight: 55,
-            minWidth: 55
+            minWidth: 100
         )
         .keyboardShortcut("4", modifiers: [.command])
     }

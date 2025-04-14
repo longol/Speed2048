@@ -1,6 +1,6 @@
 //
-//  Quest131072App.swift
-//  Quest131072
+//  Speed2048App.swift
+//  Speed2048
 //
 //  Created by Lucas Longo on 2/22/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Quest131072App: App {
+struct Speed2048App: App {
     @StateObject private var gameModel = GameViewModel()
     @Environment(\.scenePhase) var scenePhase
 
@@ -25,3 +25,4 @@ struct Quest131072App: App {
         }
     }
 }
+

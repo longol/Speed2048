@@ -46,7 +46,7 @@ class GameViewModel: ObservableObject {
     private var timer: Timer? = nil
 
     // MARK: CloudKit and Data Management
-    private let container = CKContainer(identifier: "iCloud.com.lucaslongo.Quest131072")
+    private let container = CKContainer(identifier: "iCloud.com.lucaslongo.Speed2048")
     private let recordID = CKRecord.ID(recordName: "currentGame")
 
     private var privateDatabase: CKDatabase {
@@ -55,7 +55,7 @@ class GameViewModel: ObservableObject {
     private var gameStateFileURL: URL {
         let fileManager = FileManager.default
         let directory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return directory.appendingPathComponent("Quest131072.json")
+        return directory.appendingPathComponent("Speed2048.json")
     }
 
     @Published var showVersionChoiceAlert: Bool = false
@@ -296,6 +296,7 @@ class GameViewModel: ObservableObject {
     private func updateStatusMessage(_ message: String) {
         DispatchQueue.main.async {
             self.statusMessage = message
+            print("CLOUD: " + message)
             // Empty the message after a short delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 self.statusMessage = ""
@@ -496,7 +497,6 @@ class GameViewModel: ObservableObject {
         }
     }
 
-    
     private func resolveCloudConflict(tempFileURL: URL) {
         // Re-fetch the latest record
         updateStatusMessage("Re-fetching latest cloud game")
