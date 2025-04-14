@@ -1,67 +1,67 @@
 {
   "images" : [
     {
-      "filename" : "Quest131072 1024.png",
+      "filename" : "Speed2048_1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
     },
     {
-      "filename" : "Quest131072 16.png",
+      "filename" : "Speed2048_16.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "Quest131072 32.png",
+      "filename" : "Speed2048_32 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "Quest131072 33.png",
+      "filename" : "Speed2048_32 2.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "Quest131072 64.png",
+      "filename" : "Speed2048_64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "Quest131072 128.png",
+      "filename" : "Speed2048_128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "Quest131072 256.png",
+      "filename" : "Speed2048_256.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "Quest131072 257.png",
+      "filename" : "Speed2048_256 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "Quest131072 512.png",
+      "filename" : "Speed2048_512.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "Quest131072 513.png",
+      "filename" : "Speed2048_512 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "Quest131072 1025.png",
+      "filename" : "Speed2048_1024 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
