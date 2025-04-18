@@ -9,18 +9,22 @@ import SwiftUI
 
 @main
 struct Speed2048Watch_Watch_AppApp: App {
-    @StateObject private var gameModel = GameViewModel()
+    @StateObject private var gameManager = GameManager()
     @Environment(\.scenePhase) var scenePhase
 
     var body: some Scene {
         WindowGroup {
-            ContentView(gameModel: gameModel)
+            ContentView(gameManager: gameManager)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .background || newPhase == .inactive {
-                gameModel.saveGameState()
+                Task {
+                    await gameManager.saveGameState()
+                }
             } else if newPhase == .active {
-                gameModel.checkCloudVersion()
+                Task {
+                    await gameManager.checkCloudVersion()
+                }
             }
         }
     }

@@ -7,14 +7,17 @@ import AppKit
 
 /// The main game view.
 struct ContentView: View {
-    @ObservedObject var gameModel: GameViewModel
+    @ObservedObject var gameManager: GameManager
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
     
     @State private var undoTimer: Timer?
     
-    let boardDimension: CGFloat = 4
+    // Remove the hardcoded boardDimension constant and use a computed property instead
+    var boardDimension: CGFloat {
+        CGFloat(gameManager.boardSize)
+    }
     let cellSize: CGFloat = 80
     
     var body: some View {
@@ -28,27 +31,35 @@ struct ContentView: View {
             
             keyboardShortcuts
         }
-        // Removed invalid .keyboardShortcut("s", ...) modifier
-        // Removed invalid .keyboardShortcut("o", ...) modifier
 #if os(macOS)
         .frame(minWidth: 400, minHeight: 500)
 #endif
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .sheet(isPresented: $showSettings) {
-            SettingsView(gameModel: gameModel)
+            SettingsView(gameManager: gameManager)
         }
         .onDisappear {
-            gameModel.saveGameState()
+            Task {
+                await gameManager.saveGameState()
+            }
         }
     }
     
     @ViewBuilder private var keyboardShortcuts: some View {
         Group {
-            Button("") { gameModel.saveGameState() }
-                .keyboardShortcut("s", modifiers: .command)
+            Button("") {
+                Task {
+                    await gameManager.saveGameState()
+                }
+            }
+            .keyboardShortcut("s", modifiers: .command)
             
-            Button("") { gameModel.checkCloudVersion() }
-                .keyboardShortcut("o", modifiers: .command)
+            Button("") {
+                Task {
+                    await gameManager.checkCloudVersion()
+                }
+            }
+            .keyboardShortcut("o", modifiers: .command)
         }
         .frame(width: 0, height: 0)
         .hidden()
@@ -65,15 +76,15 @@ struct ContentView: View {
             settingsButton
         }
         .padding()
-        .alert(isPresented: $gameModel.showVersionChoiceAlert) {
+        .alert(isPresented: $gameManager.showVersionChoiceAlert) {
             Alert(
                 title: Text("Cloud Game Found"),
                 message: Text("Cloud game with higher score found. Use it or use your local version?"),
                 primaryButton: .default(Text("Use Cloud")) {
-                    gameModel.applyVersionChoice(useCloud: true)
+                    gameManager.applyVersionChoice(useCloud: true)
                 },
                 secondaryButton: .destructive(Text("Use Local")) {
-                    gameModel.applyVersionChoice(useCloud: false)
+                    gameManager.applyVersionChoice(useCloud: false)
                 }
             )
         }
@@ -94,20 +105,20 @@ struct ContentView: View {
         VStack {
             
             LazyVGrid(columns: columnsTwo, spacing: 10) {
-                scoreUnit(text: "Level", icon: "quotelevel", value: gameModel.gameLevel.description)
-                scoreUnit(text: "Sum", icon: "sum", value: gameModel.totalScore.formatted())
+                scoreUnit(text: "Level", icon: "quotelevel", value: gameManager.gameLevel.description)
+                scoreUnit(text: "Sum", icon: "sum", value: gameManager.totalScore.formatted())
             }
             
             LazyVGrid(columns: columnsTwo, spacing: 10) {
                 
-                scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameModel.undosUsed.formatted())
-                scoreUnit(text:"+4s", icon: "4.circle", value: gameModel.manual4sUsed.formatted())
+                scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameManager.undosUsed.formatted())
+                scoreUnit(text:"+4s", icon: "4.circle", value: gameManager.manual4sUsed.formatted())
             }
             
             LazyVGrid(columns: columnsOne, spacing: 10) {
                 Label("Time:", systemImage: "clock")
                     .font(.system(size: 18, weight: .bold))
-                Text(gameModel.seconds.formattedAsTime)
+                Text(gameManager.seconds.formattedAsTime)
                     .font(.system(size: 18, weight: .regular))
             }
         }
@@ -129,8 +140,8 @@ struct ContentView: View {
     
     @ViewBuilder private var statusMessage: some View {
         HStack {
-            if !gameModel.statusMessage.isEmpty {
-                Label(gameModel.statusMessage, systemImage: "bolt.horizontal.icloud")
+            if !gameManager.statusMessage.isEmpty {
+                Label(gameManager.statusMessage, systemImage: "bolt.horizontal.icloud")
                 ProgressView()
                     .scaleEffect(0.5)
             } else {
@@ -149,9 +160,6 @@ struct ContentView: View {
                 undoButton
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
                 addFourButton
-                Spacer()
-                // loadButton removed
-                // saveButton removed
                 Spacer()
                 newButton
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
@@ -177,7 +185,7 @@ struct ContentView: View {
                     }
                 }
                 // Draw the tiles.
-                ForEach(gameModel.tiles) { tile in
+                ForEach(gameManager.tiles) { tile in
                     TileView(tile: tile, cellSize: cellSize)
                 }
             }
@@ -186,10 +194,10 @@ struct ContentView: View {
             .cornerRadius(8)
             .background(KeyEventHandlingView { key in
                 switch key {
-                case .left:  gameModel.move(.left)
-                case .right: gameModel.move(.right)
-                case .up:    gameModel.move(.up)
-                case .down:  gameModel.move(.down)
+                case .left:  gameManager.move(.left)
+                case .right: gameManager.move(.right)
+                case .up:    gameManager.move(.up)
+                case .down:  gameManager.move(.down)
                 }
             })
             .gesture(
@@ -200,7 +208,7 @@ struct ContentView: View {
                         let direction: Direction = (abs(horizontal) > abs(vertical)) ?
                         (horizontal > 0 ? .right : .left) :
                         (vertical > 0 ? .down : .up)
-                        gameModel.move(direction)
+                        gameManager.move(direction)
                     }
             )
             
@@ -213,7 +221,7 @@ struct ContentView: View {
     @ViewBuilder private var settingsButton: some View {
         Button {
             showSettings.toggle()
-            gameModel.stopTimer()
+            gameManager.stopTimer()
         } label: {
             Image(systemName: "gear")
         }
@@ -234,7 +242,7 @@ struct ContentView: View {
     @ViewBuilder private var newButton: some View {
         Button(action: {
             showAlert = true
-            gameModel.stopTimer()
+            gameManager.stopTimer()
         }) {
             Image(systemName: "plus.circle")
         }
@@ -256,23 +264,23 @@ struct ContentView: View {
                 message: Text("Are you sure you want to start a new game?"),
                 primaryButton: .default(
                     Text("Cancel"),
-                    action: gameModel.startTimer
+                    action: gameManager.startTimer
                 ),
                 secondaryButton: .destructive(
                     Text("New Game"),
-                    action: gameModel.newGame
+                    action: gameManager.newGame
                 )
             )
         }
         .onChange(of: showAlert, { oldValue, newValue in
             if !newValue {
-                gameModel.startTimer() // Restart the timer when the alert is dismissed
+                gameManager.startTimer() // Restart the timer when the alert is dismissed
             }
         })
     }
     
     @ViewBuilder private var undoButton: some View {
-        Button(action: { gameModel.undo() }) {
+        Button(action: { gameManager.undo() }) {
             Image(systemName: "arrow.uturn.backward.circle")
         }
         .onLongPressGesture(
@@ -302,7 +310,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder private var addFourButton: some View {
-        Button(action: { gameModel.forceTile() }) {
+        Button(action: { gameManager.forceTile() }) {
             Image(systemName: "4.circle")
         }
         .gameButtonStyle(
@@ -323,7 +331,9 @@ struct ContentView: View {
     private func startUndoTimer() {
         stopUndoTimer() // Ensure no existing timer is running
         undoTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
-            gameModel.undo()
+            Task { @MainActor in
+                gameManager.undo()
+            }
         }
     }
     

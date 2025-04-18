@@ -1,7 +1,7 @@
 import SwiftUI
 /// The main game view.
 struct ContentView: View {
-    @StateObject var gameModel: GameViewModel
+    @StateObject var gameManager: GameManager
 
     @State private var showScoreView = false // State to control ScoreView presentation
 
@@ -14,10 +14,12 @@ struct ContentView: View {
         }
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .onDisappear {
-            gameModel.saveGameState()
+            Task {
+                await gameManager.saveGameState()
+            }
         }
         .sheet(isPresented: $showScoreView) {
-            ScoreView(gameModel: gameModel) // Present the ScoreView
+            ScoreView(gameManager: gameManager) // Present the ScoreView
         }
     }
         
@@ -39,7 +41,7 @@ struct ContentView: View {
                     }
                 }
                 // Draw the tiles.
-                ForEach(gameModel.tiles) { tile in
+                ForEach(gameManager.tiles) { tile in
                     TileView(tile: tile, cellSize: cellSize)
                 }
             }
@@ -54,7 +56,7 @@ struct ContentView: View {
                         let direction: Direction = (abs(horizontal) > abs(vertical)) ?
                         (horizontal > 0 ? .right : .left) :
                         (vertical > 0 ? .down : .up)
-                        gameModel.move(direction)
+                        gameManager.move(direction)
                     }
             )
             .gesture(

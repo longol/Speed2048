@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ScoreView: View {
-    @ObservedObject var gameModel: GameViewModel
+    @ObservedObject var gameManager: GameManager
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -10,7 +10,7 @@ struct ScoreView: View {
                 .font(.headline)
                 .padding()
 
-            Text("\(gameModel.totalScore)")
+            Text("\(gameManager.totalScore)")
                 .font(.largeTitle)
                 .bold()
                 .padding()
@@ -21,17 +21,17 @@ struct ScoreView: View {
                 HStack {
                     Label("Level", systemImage: "quotelevel")
                     Spacer()
-                    Text("\(gameModel.gameLevel)")
+                    Text("\($gameManager.gameLevel)")
                 }
                 HStack {
                     Label("Time", systemImage: "clock")
                     Spacer()
-                    Text(gameModel.seconds.formattedAsTime)
+                    Text(gameManager.seconds.formattedAsTime)
                 }
                 HStack {
                     Label("Undos", systemImage: "arrow.uturn.backward.circle")
                     Spacer()
-                    Text("\(gameModel.undosUsed)")
+                    Text("\(gameManager.undosUsed)")
                 }
             }
             .padding()

@@ -25,32 +25,39 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A8452E392DB2E38D00E402F7 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Game/GameManager.swift,
+				Utilities/DataManager.swift,
+				Utilities/Extensions.swift,
+				Utilities/ViewModifiers.swift,
+				Views/TileModelView.swift,
+			);
+			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
+		};
 		A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
-				ContentView.swift = (ios, macos, );
+				Views/ContentView.swift = (ios, macos, );
 			};
 			target = A85FA9322D9CE3A800959E76 /* Speed2048 */;
-		};
-		A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Extensions.swift,
-				GameViewModel.swift,
-				Helpers.swift,
-				TileModelView.swift,
-				ViewModifiers.swift,
-			);
-			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A8452E2B2DB2E38D00E402F7 /* SharedCode */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A8452E392DB2E38D00E402F7 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */,
+			);
+			path = SharedCode;
+			sourceTree = "<group>";
+		};
 		A85FA9352D9CE3A800959E76 /* Speed2048 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */,
-				A8ED80FE2DA5DCFE0095BE35 /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */,
 			);
 			path = Speed2048;
 			sourceTree = "<group>";
@@ -83,6 +90,7 @@
 		A85FA92A2D9CE3A800959E76 = {
 			isa = PBXGroup;
 			children = (
+				A8452E2B2DB2E38D00E402F7 /* SharedCode */,
 				A85FA9352D9CE3A800959E76 /* Speed2048 */,
 				A8C37A332DA5D35100A76CCD /* Speed2048Watch Watch App */,
 				A85FA9342D9CE3A800959E76 /* Products */,
@@ -115,6 +123,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				A8452E2B2DB2E38D00E402F7 /* SharedCode */,
 				A85FA9352D9CE3A800959E76 /* Speed2048 */,
 			);
 			name = Speed2048;

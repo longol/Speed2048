@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-/// A tile on the board.
-struct Tile: Identifiable, Equatable, Codable {
-    let id: UUID
-    var value: Int
-    var row: Int
-    var col: Int
-}
-
-/// A view for an individual tile.
 struct TileView: View {
     var tile: Tile
     var cellSize: CGFloat
