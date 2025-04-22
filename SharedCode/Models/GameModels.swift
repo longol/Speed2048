@@ -9,6 +9,7 @@ struct GameState: Codable {
     var undosUsed: Int
     var manual4sUsed: Int
     var boardSize: Int
+    var escalatingMode: Bool
 }
 
 struct Tile: Codable, Identifiable, Equatable {

@@ -20,7 +20,11 @@ struct SettingsView: View {
             
             Divider()
             
-            boardSizePicker // Added board size picker
+            boardSizePicker
+            
+            Divider()
+            
+            escalatingModeToggle
             
             Divider()
 
@@ -114,6 +118,22 @@ struct SettingsView: View {
         }
     }
     
+    @ViewBuilder private var escalatingModeToggle: some View {
+        VStack(alignment: .leading) {
+            Text("Game Modes").bold()
+            
+            Toggle(isOn: $gameManager.escalatingMode) {
+                Label("Escalating Tiles", systemImage: "arrow.up.forward")
+            }
+            .padding()
+            
+            Text("In escalating mode, when no more 2s remain, you'll start getting 4s and 8s. When no more 4s remain, you'll start getting 8s and 16s, and so on.")
+                .font(.caption)
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+        }
+    }
+    
     @ViewBuilder private var animationSpeedToggle: some View {
         VStack(alignment: .leading) {
             Text("Animation Levels").bold()
@@ -137,16 +157,25 @@ struct SettingsView: View {
                         await gameManager.saveGameState()
                     }
                 } label: {
-                    Label("Save Game to Cloud", systemImage: "icloud.and.arrow.up")
+                    Label("Cloud Save", systemImage: "icloud.and.arrow.up")
                 }
                 .keyboardShortcut("s", modifiers: [.command])
                 
                 Button {
                     gameManager.applyVersionChoice(useCloud: true)
                 } label: {
-                    Label("Load Game from Cloud", systemImage: "icloud.and.arrow.down")
+                    Label("Cloud Game ", systemImage: "icloud.and.arrow.down")
                 }
                 .keyboardShortcut("o", modifiers: [.command])
+                
+                Button {
+                    Task {
+                        await gameManager.loadGameStateLocally()
+                    }
+                } label: {
+                    Label("Local Game", systemImage: "externaldrive")
+                }
+                .keyboardShortcut("l", modifiers: [.command])
                 
             }
             .buttonStyle(.borderedProminent)

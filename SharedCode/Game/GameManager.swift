@@ -29,6 +29,7 @@ class GameManager: ObservableObject {
             }
         }
     }
+    @Published var escalatingMode: Bool = false 
     
     // UI state
     @Published var statusMessage: String = ""
@@ -56,7 +57,8 @@ class GameManager: ObservableObject {
             fastAnimations: fastAnimations,
             undosUsed: undosUsed,
             manual4sUsed: manual4sUsed,
-            boardSize: boardSize
+            boardSize: boardSize,
+            escalatingMode: escalatingMode
         )
     }
     
@@ -201,8 +203,17 @@ class GameManager: ObservableObject {
         let emptyPositions = boardLogic.getEmptyPositions(tiles: tiles)
         guard !emptyPositions.isEmpty, let pos = emptyPositions.randomElement() else { return }
         
-        // Determine the value based on the probability of fours
-        let value = Double.random(in: 0..<1) < gameLevel.probabilityOfFours ? 4 : 2
+        var lowValue: Int = 2
+        var highValue: Int = 4
+
+        if escalatingMode && tiles.count > 4 {
+            // Get the lowest value from the existing tiles
+            let existingValues = tiles.map { $0.value }
+            lowValue = existingValues.min() ?? 2
+            highValue = lowValue
+        } 
+
+        let value = Double.random(in: 0..<1) < gameLevel.probabilityOfFours ? highValue : lowValue
         let tile = Tile(id: UUID(), value: value, row: pos.row, col: pos.col)
         
         withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {

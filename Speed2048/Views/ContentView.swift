@@ -60,6 +60,12 @@ struct ContentView: View {
                 }
             }
             .keyboardShortcut("o", modifiers: .command)
+            Button("") {
+                Task {
+                    await gameManager.loadGameStateLocally()
+                }
+            }
+            .keyboardShortcut("l", modifiers: [.command])
         }
         .frame(width: 0, height: 0)
         .hidden()
