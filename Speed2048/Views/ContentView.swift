@@ -23,7 +23,13 @@ struct ContentView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             headerView
+            
+#if os(macOS)
+            scoresViewMac
+#else
             scoresView
+#endif
+            
             statusMessage
             Spacer()
             gameButtonsView
@@ -93,6 +99,21 @@ struct ContentView: View {
                     gameManager.applyVersionChoice(useCloud: false)
                 }
             )
+        }
+    }
+    
+    @ViewBuilder private var scoresViewMac: some View {
+        HStack(alignment: .top) {
+            scoresView
+            Spacer()
+            VStack(alignment: .leading) {
+                EscalatingModeToggle(gameManager: gameManager, showTitle: false)
+                AnimationSpeedToggle(gameManager: gameManager, showTitle: false)
+            }
+            VStack(alignment: .leading) {
+                GameLevelPicker(gameManager: gameManager, showTitle: false)
+                BoardSizePicker(gameManager: gameManager, showTitle: false)
+            }
         }
     }
     
@@ -194,6 +215,21 @@ struct ContentView: View {
                 ForEach(gameManager.tiles) { tile in
                     TileView(tile: tile, cellSize: cellSize)
                 }
+                
+                // Game message overlay
+                if gameManager.showOverlayMessage {
+                    Text(gameManager.overlayMessage)
+                        .font(.system(size: min(50, side/5), weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.5))
+                                .shadow(radius: 5)
+                        )
+                        .transition(.scale.combined(with: .opacity))
+                        .zIndex(100) // Ensure it's above all other elements
+                }
             }
             .frame(width: side, height: side)
             .background(Color.gray.opacity(0.3))
@@ -217,7 +253,7 @@ struct ContentView: View {
                         gameManager.move(direction)
                     }
             )
-            
+            .animation(.easeInOut(duration: 0.3), value: gameManager.showOverlayMessage)
         }
         .aspectRatio(1, contentMode: .fit)
         .padding()

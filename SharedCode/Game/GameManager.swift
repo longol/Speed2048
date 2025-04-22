@@ -29,11 +29,18 @@ class GameManager: ObservableObject {
             }
         }
     }
-    @Published var escalatingMode: Bool = false 
+    @Published var previousHighMerge: Int = 128
+    @Published var escalatingMode: Bool = false
+    @Published var escalatingValue: Int = 2
     
     // UI state
     @Published var statusMessage: String = ""
     @Published var showVersionChoiceAlert: Bool = false
+    
+    // Overlay message state
+    @Published var overlayMessage: String = ""
+    @Published var showOverlayMessage: Bool = false
+    private var overlayMessageTask: Task<Void, Never>? = nil
     
     // Private state
     private var fetchedCloudGameState: GameState? = nil
@@ -197,23 +204,31 @@ class GameManager: ObservableObject {
         addRandomTile()
         addRandomTile()
         startTimer()
+        showGameMessage("New Game Started")
     }
     
     func addRandomTile() {
         let emptyPositions = boardLogic.getEmptyPositions(tiles: tiles)
         guard !emptyPositions.isEmpty, let pos = emptyPositions.randomElement() else { return }
         
-        var lowValue: Int = 2
+//        var lowValue: Int = 2
         var highValue: Int = 4
 
         if escalatingMode && tiles.count > 4 {
             // Get the lowest value from the existing tiles
             let existingValues = tiles.map { $0.value }
-            lowValue = existingValues.min() ?? 2
+            let lowValue = existingValues.min() ?? 2
+            if escalatingValue < lowValue {
+                showGameMessage("Removed: \(escalatingValue)s!!", duration: 1.0)
+                escalatingValue = lowValue
+            }
             highValue = lowValue
+            
+            // Show a message about the escalating mode changing values
+            
         } 
 
-        let value = Double.random(in: 0..<1) < gameLevel.probabilityOfFours ? highValue : lowValue
+        let value = Double.random(in: 0..<1) < gameLevel.probabilityOfFours ? highValue : escalatingValue
         let tile = Tile(id: UUID(), value: value, row: pos.row, col: pos.col)
         
         withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
@@ -255,19 +270,32 @@ class GameManager: ObservableObject {
         } else {
             // If no move occurred, remove the state saved for undo
             _ = undoStack.popLast()
+//            showGameMessage("No move possible")
         }
     }
     
     // Perform merges with animation
     private func performMerges(mergeInstructions: [MergeInstruction]) {
+        // Track highest value merged for messaging
+        var highestMergedValue = 0
+        
         for merge in mergeInstructions {
             if let mainIndex = self.tiles.firstIndex(where: { $0.id == merge.mainTileID }) {
                 self.tiles[mainIndex].value = merge.newValue
+                if merge.newValue > highestMergedValue {
+                    highestMergedValue = merge.newValue
+                }
             }
             
             withAnimation(.easeInOut(duration: self.animationDurationShowHide)) {
                 self.tiles.removeAll { $0.id == merge.mergingTileID }
             }
+        }
+        
+        // Show message for significant merges
+        if highestMergedValue > previousHighMerge {
+            showGameMessage("\(highestMergedValue)!", duration: 2.0)
+            previousHighMerge = highestMergedValue
         }
         
         // After merges complete, finalize the move
@@ -286,6 +314,7 @@ class GameManager: ObservableObject {
                 tiles = previousState
             }
             undosUsed += 1
+            showGameMessage("Move Undone")
         }
     }
     
@@ -306,6 +335,28 @@ class GameManager: ObservableObject {
         stopTimer()
         tiles = boardLogic.generatePerfectBoard()
         startTimer()
+    }
+    
+    // MARK: - Overlay Message
+    func showGameMessage(_ message: String, duration: Double = 1.5) {
+        // Cancel any existing message task
+        overlayMessageTask?.cancel()
+        
+        // Set and show the new message
+        overlayMessage = message
+        showOverlayMessage = true
+        
+        // Create a new task to hide the message after the specified duration
+        overlayMessageTask = Task {
+            do {
+                try await Task.sleep(for: .seconds(duration))
+                if !Task.isCancelled {
+                    showOverlayMessage = false
+                }
+            } catch {
+                // Task was cancelled, do nothing
+            }
+        }
     }
 }
 

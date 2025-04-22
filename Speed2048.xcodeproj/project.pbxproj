@@ -32,6 +32,10 @@
 				Utilities/DataManager.swift,
 				Utilities/Extensions.swift,
 				Utilities/ViewModifiers.swift,
+				"Views/Game Settings View/AnimationSpeedToggle.swift",
+				"Views/Game Settings View/BoardSizePicker.swift",
+				"Views/Game Settings View/EscalatingModeToggle.swift",
+				"Views/Game Settings View/GameLevelPicker.swift",
 				Views/TileModelView.swift,
 			);
 			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;

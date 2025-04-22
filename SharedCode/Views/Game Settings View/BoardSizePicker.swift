@@ -16,7 +16,7 @@ struct BoardSizePicker: View {
             if showTitle {
                 Text("Board Size").bold()
             }
-
+            
             HStack {
                 Text("4x4")
                 Slider(value: Binding(
@@ -43,5 +43,6 @@ struct BoardSizePicker: View {
                 }
             }
         }
+        .padding()
     }
 }

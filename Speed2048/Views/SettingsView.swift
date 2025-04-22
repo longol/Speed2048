@@ -16,15 +16,15 @@ struct SettingsView: View {
             
             Divider()
             
-            gameLevelPicker
+            GameLevelPicker(gameManager: gameManager)
             
             Divider()
             
-            boardSizePicker
+            BoardSizePicker(gameManager: gameManager)
             
             Divider()
             
-            escalatingModeToggle
+            EscalatingModeToggle(gameManager: gameManager)
             
             Divider()
 
@@ -32,7 +32,7 @@ struct SettingsView: View {
 
             Divider()
             
-            animationSpeedToggle
+            AnimationSpeedToggle(gameManager: gameManager)
             
             Divider()
             
@@ -61,88 +61,88 @@ struct SettingsView: View {
         }
     }
     
-    @ViewBuilder private var gameLevelPicker: some View {
-        VStack(alignment: .leading) {
-            
-            Text("Game Level").bold()
-            
-            Picker("Game Level", selection: $gameManager.gameLevel) {
-                ForEach(GameLevel.allCases, id: \.self) { level in
-                    Text(level.description).tag(level)
-                }
-            }
-#if os(watchOS)
-            .pickerStyle(InlinePickerStyle())
-#else
-            .pickerStyle(SegmentedPickerStyle())
-#endif
-            
-            HStack {
-                Spacer()
-                Text(gameManager.gameLevel.penaltyString)
-                    .font(.caption)
-                Spacer()
-            }
-            
-            
-        }
-    }
+//    @ViewBuilder private var gameLevelPicker: some View {
+//        VStack(alignment: .leading) {
+//            
+//            Text("Game Level").bold()
+//            
+//            Picker("Game Level", selection: $gameManager.gameLevel) {
+//                ForEach(GameLevel.allCases, id: \.self) { level in
+//                    Text(level.description).tag(level)
+//                }
+//            }
+//#if os(watchOS)
+//            .pickerStyle(InlinePickerStyle())
+//#else
+//            .pickerStyle(SegmentedPickerStyle())
+//#endif
+//            
+//            HStack {
+//                Spacer()
+//                Text(gameManager.gameLevel.penaltyString)
+//                    .font(.caption)
+//                Spacer()
+//            }
+//            
+//            
+//        }
+//    }
     
-    @ViewBuilder private var boardSizePicker: some View {
-        VStack(alignment: .leading) {
-            Text("Board Size").bold()
-            
-            HStack {
-                Text("4x4")
-                Slider(value: Binding(
-                    get: { Double(gameManager.boardSize) },
-                    set: { gameManager.boardSize = Int($0) }
-                ), in: 4...10, step: 1)
-                Text("10x10")
-            }
-            
-            HStack {
-                Spacer()
-                Text("\(gameManager.boardSize)x\(gameManager.boardSize)")
-                    .font(.headline)
-                Spacer()
-            }
-            
-            HStack {
-                Spacer()
-                Text("Changing board size will start a new game")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                Spacer()
-            }
-        }
-    }
+//    @ViewBuilder private var boardSizePicker: some View {
+//        VStack(alignment: .leading) {
+//            Text("Board Size").bold()
+//            
+//            HStack {
+//                Text("4x4")
+//                Slider(value: Binding(
+//                    get: { Double(gameManager.boardSize) },
+//                    set: { gameManager.boardSize = Int($0) }
+//                ), in: 4...10, step: 1)
+//                Text("10x10")
+//            }
+//            
+//            HStack {
+//                Spacer()
+//                Text("\(gameManager.boardSize)x\(gameManager.boardSize)")
+//                    .font(.headline)
+//                Spacer()
+//            }
+//            
+//            HStack {
+//                Spacer()
+//                Text("Changing board size will start a new game")
+//                    .font(.caption)
+//                    .foregroundColor(.gray)
+//                Spacer()
+//            }
+//        }
+//    }
     
-    @ViewBuilder private var escalatingModeToggle: some View {
-        VStack(alignment: .leading) {
-            Text("Game Modes").bold()
-            
-            Toggle(isOn: $gameManager.escalatingMode) {
-                Label("Escalating Tiles", systemImage: "arrow.up.forward")
-            }
-            .padding()
-            
-            Text("In escalating mode, when no more 2s remain, you'll start getting 4s and 8s. When no more 4s remain, you'll start getting 8s and 16s, and so on.")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.horizontal)
-        }
-    }
+//    @ViewBuilder private var escalatingModeToggle: some View {
+//        VStack(alignment: .leading) {
+//            Text("Game Modes").bold()
+//            
+//            Toggle(isOn: $gameManager.escalatingMode) {
+//                Label("Escalating Tiles", systemImage: "arrow.up.forward")
+//            }
+//            .padding()
+//            
+//            Text("In escalating mode, when no more 2s remain, you'll start getting 4s and 8s. When no more 4s remain, you'll start getting 8s and 16s, and so on.")
+//                .font(.caption)
+//                .foregroundColor(.gray)
+//                .padding(.horizontal)
+//        }
+//    }
     
-    @ViewBuilder private var animationSpeedToggle: some View {
-        VStack(alignment: .leading) {
-            Text("Animation Levels").bold()
-            Toggle(isOn: $gameManager.fastAnimations) {
-                Label("Fast animations?", systemImage: "hare")
-            }
-            .padding()
-        }
-    }
+//    @ViewBuilder private var animationSpeedToggle: some View {
+//        VStack(alignment: .leading) {
+//            Text("Animation Levels").bold()
+//            Toggle(isOn: $gameManager.fastAnimations) {
+//                Label("Fast animations?", systemImage: "hare")
+//            }
+//            .padding()
+//        }
+//    }
     
     @ViewBuilder private var cloudSyncSection: some View {
         VStack(alignment: .center) {
