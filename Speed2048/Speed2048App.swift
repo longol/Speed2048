@@ -14,7 +14,8 @@ struct Speed2048App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(gameManager: gameManager)
+            ContentView()
+                .environmentObject(gameManager)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .background || newPhase == .inactive {

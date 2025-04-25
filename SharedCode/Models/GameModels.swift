@@ -1,6 +1,6 @@
 import Foundation
 
-struct GameState: Codable {
+struct GameState: Codable, Equatable {
     var tiles: [Tile]
     var seconds: Int
     var undoStack: [[Tile]]
@@ -9,7 +9,6 @@ struct GameState: Codable {
     var undosUsed: Int
     var manual4sUsed: Int
     var boardSize: Int
-    var escalatingMode: Bool
 }
 
 struct Tile: Codable, Identifiable, Equatable {
@@ -78,5 +77,11 @@ enum GameLevel: String, Codable, CaseIterable {
         case .onlyFours: return "Loose 2 seconds!"
         }
     }
-
+    
+    var nextTileValue: Int {
+        switch self {
+        case .onlyTwos: return 2
+        default: return 4
+        }
+    }
 }

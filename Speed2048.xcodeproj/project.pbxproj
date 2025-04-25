@@ -34,7 +34,6 @@
 				Utilities/ViewModifiers.swift,
 				"Views/Game Settings View/AnimationSpeedToggle.swift",
 				"Views/Game Settings View/BoardSizePicker.swift",
-				"Views/Game Settings View/EscalatingModeToggle.swift",
 				"Views/Game Settings View/GameLevelPicker.swift",
 				Views/TileModelView.swift,
 			);

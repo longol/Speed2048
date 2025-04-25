@@ -8,8 +8,14 @@
 import SwiftUI
 
 struct BoardSizePicker: View {
-    @ObservedObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
     var showTitle = true
+    
+    @State private var temporaryBoardSize: Int = 4
+    
+    init(showTitle: Bool = true) {
+        self.showTitle = showTitle
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -19,16 +25,23 @@ struct BoardSizePicker: View {
             
             HStack {
                 Text("4x4")
-                Slider(value: Binding(
-                    get: { Double(gameManager.boardSize) },
-                    set: { gameManager.boardSize = Int($0) }
-                ), in: 4...10, step: 1)
+                Slider(
+                    value: Binding(
+                        get: { Double(temporaryBoardSize) },
+                        set: { 
+                            temporaryBoardSize = Int($0) 
+                            gameManager.boardSize = temporaryBoardSize
+                        }
+                    ),
+                    in: 4...10, 
+                    step: 1
+                )
                 Text("10x10")
             }
             
             HStack {
                 Spacer()
-                Text("\(gameManager.boardSize)x\(gameManager.boardSize)")
+                Text("\(temporaryBoardSize)x\(temporaryBoardSize)")
                     .font(.headline)
                 Spacer()
             }
@@ -36,7 +49,7 @@ struct BoardSizePicker: View {
             if showTitle {
                 HStack {
                     Spacer()
-                    Text("Changing board size will start a new game")
+                    Text("Tiles will be preserved when changing board size")
                         .font(.caption)
                         .foregroundColor(.gray)
                     Spacer()
@@ -44,5 +57,11 @@ struct BoardSizePicker: View {
             }
         }
         .padding()
+        .onAppear {
+            self.temporaryBoardSize = gameManager.boardSize
+        }
+        .onChange(of: gameManager.boardSize) { oldValue, newValue in
+            self.temporaryBoardSize = gameManager.boardSize
+        }
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ScoreView: View {
-    @ObservedObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
     @Environment(\.dismiss) var dismiss
     
     var body: some View {

@@ -7,7 +7,7 @@ enum AnimationLevel: String, CaseIterable {
 
 struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
     
     var body: some View {
         ScrollView {
@@ -16,27 +16,24 @@ struct SettingsView: View {
             
             Divider()
             
-            GameLevelPicker(gameManager: gameManager)
+            GameLevelPicker()
             
             Divider()
             
-            BoardSizePicker(gameManager: gameManager)
+            BoardSizePicker()
             
-            Divider()
-            
-            EscalatingModeToggle(gameManager: gameManager)
-            
-            Divider()
-
-            perfectBoardView
 
             Divider()
             
-            AnimationSpeedToggle(gameManager: gameManager)
-            
+            AnimationSpeedToggle()
+
             Divider()
             
             cloudSyncSection
+            
+            Divider()
+            
+            perfectBoardView
             
             Divider()
             
@@ -60,89 +57,6 @@ struct SettingsView: View {
             .padding(5)
         }
     }
-    
-//    @ViewBuilder private var gameLevelPicker: some View {
-//        VStack(alignment: .leading) {
-//            
-//            Text("Game Level").bold()
-//            
-//            Picker("Game Level", selection: $gameManager.gameLevel) {
-//                ForEach(GameLevel.allCases, id: \.self) { level in
-//                    Text(level.description).tag(level)
-//                }
-//            }
-//#if os(watchOS)
-//            .pickerStyle(InlinePickerStyle())
-//#else
-//            .pickerStyle(SegmentedPickerStyle())
-//#endif
-//            
-//            HStack {
-//                Spacer()
-//                Text(gameManager.gameLevel.penaltyString)
-//                    .font(.caption)
-//                Spacer()
-//            }
-//            
-//            
-//        }
-//    }
-    
-//    @ViewBuilder private var boardSizePicker: some View {
-//        VStack(alignment: .leading) {
-//            Text("Board Size").bold()
-//            
-//            HStack {
-//                Text("4x4")
-//                Slider(value: Binding(
-//                    get: { Double(gameManager.boardSize) },
-//                    set: { gameManager.boardSize = Int($0) }
-//                ), in: 4...10, step: 1)
-//                Text("10x10")
-//            }
-//            
-//            HStack {
-//                Spacer()
-//                Text("\(gameManager.boardSize)x\(gameManager.boardSize)")
-//                    .font(.headline)
-//                Spacer()
-//            }
-//            
-//            HStack {
-//                Spacer()
-//                Text("Changing board size will start a new game")
-//                    .font(.caption)
-//                    .foregroundColor(.gray)
-//                Spacer()
-//            }
-//        }
-//    }
-    
-//    @ViewBuilder private var escalatingModeToggle: some View {
-//        VStack(alignment: .leading) {
-//            Text("Game Modes").bold()
-//            
-//            Toggle(isOn: $gameManager.escalatingMode) {
-//                Label("Escalating Tiles", systemImage: "arrow.up.forward")
-//            }
-//            .padding()
-//            
-//            Text("In escalating mode, when no more 2s remain, you'll start getting 4s and 8s. When no more 4s remain, you'll start getting 8s and 16s, and so on.")
-//                .font(.caption)
-//                .foregroundColor(.gray)
-//                .padding(.horizontal)
-//        }
-//    }
-    
-//    @ViewBuilder private var animationSpeedToggle: some View {
-//        VStack(alignment: .leading) {
-//            Text("Animation Levels").bold()
-//            Toggle(isOn: $gameManager.fastAnimations) {
-//                Label("Fast animations?", systemImage: "hare")
-//            }
-//            .padding()
-//        }
-//    }
     
     @ViewBuilder private var cloudSyncSection: some View {
         VStack(alignment: .center) {
@@ -179,11 +93,11 @@ struct SettingsView: View {
                 
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!gameManager.statusMessage.isEmpty)
+            .disabled(!gameManager.overlayMessage.isEmpty)
             
             HStack {
-                if !gameManager.statusMessage.isEmpty {
-                    Label(gameManager.statusMessage, systemImage: "bolt.horizontal.icloud")
+                if !gameManager.overlayMessage.isEmpty {
+                    Label(gameManager.overlayMessage, systemImage: "bolt.horizontal.icloud")
                     ProgressView()
                         .scaleEffect(0.5)
                 } else {

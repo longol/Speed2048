@@ -7,7 +7,7 @@ import AppKit
 
 /// The main game view.
 struct ContentView: View {
-    @ObservedObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
     
     @State private var showAlert = false
     @State private var showSettings: Bool = false
@@ -29,12 +29,10 @@ struct ContentView: View {
 #else
             scoresView
 #endif
-            
-            statusMessage
+            // statusMessage view removed - now handled by overlayMessageView
             Spacer()
             gameButtonsView
             gameBoardView
-            
             keyboardShortcuts
         }
 #if os(macOS)
@@ -42,7 +40,7 @@ struct ContentView: View {
 #endif
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .sheet(isPresented: $showSettings) {
-            SettingsView(gameManager: gameManager)
+            SettingsView()
         }
         .onDisappear {
             Task {
@@ -107,12 +105,9 @@ struct ContentView: View {
             scoresView
             Spacer()
             VStack(alignment: .leading) {
-                EscalatingModeToggle(gameManager: gameManager, showTitle: false)
-                AnimationSpeedToggle(gameManager: gameManager, showTitle: false)
-            }
-            VStack(alignment: .leading) {
-                GameLevelPicker(gameManager: gameManager, showTitle: false)
-                BoardSizePicker(gameManager: gameManager, showTitle: false)
+                GameLevelPicker(showTitle: false)
+                BoardSizePicker(showTitle: false)
+//                AnimationSpeedToggle(showTitle: false)
             }
         }
     }
@@ -165,22 +160,6 @@ struct ContentView: View {
         
     }
     
-    @ViewBuilder private var statusMessage: some View {
-        HStack {
-            if !gameManager.statusMessage.isEmpty {
-                Label(gameManager.statusMessage, systemImage: "bolt.horizontal.icloud")
-                ProgressView()
-                    .scaleEffect(0.5)
-            } else {
-                EmptyView()
-            }
-        }
-        .font(.callout)
-        .frame(height: 30)
-        .foregroundStyle(.gray.opacity(0.5))
-        .layoutPriority(1)  // ensure the game board isn't squeezed by other views
-    }
-
     @ViewBuilder private var gameButtonsView: some View {
         VStack(alignment: .center) {
             HStack {
@@ -188,12 +167,45 @@ struct ContentView: View {
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
                 addFourButton
                 Spacer()
+                overlayMessageView
+                Spacer()
+                editButton
                 newButton
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
             }
         }
     }
 
+    @ViewBuilder private var overlayMessageView: some View {
+        if gameManager.showOverlayMessage {
+            Group {
+                if gameManager.isSystemMessage {
+                    // System message style (former status message)
+                    HStack {
+                        Label(gameManager.overlayMessage, systemImage: "bolt.horizontal.icloud")
+                        ProgressView()
+                            .scaleEffect(0.5)
+                    }
+                    .font(.callout)
+                    .foregroundStyle(.gray.opacity(0.8))
+                    .padding(6)
+                } else {
+                    // Game message style (former overlay message)
+                    Text(gameManager.overlayMessage)
+                        .foregroundStyle(.gray)
+                        .padding()
+                }
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.5))
+                    .shadow(radius: gameManager.isSystemMessage ? 3 : 5)
+            )
+            .transition(.scale.combined(with: .opacity))
+            .zIndex(100) // Ensure it's above all other elements
+        }
+    }
+    
     @ViewBuilder private var gameBoardView: some View {
         GeometryReader { geo in
             let side = geo.size.width
@@ -213,23 +225,16 @@ struct ContentView: View {
                 }
                 // Draw the tiles.
                 ForEach(gameManager.tiles) { tile in
-                    TileView(tile: tile, cellSize: cellSize)
+                    TileView(
+                        tile: tile,
+                        cellSize: cellSize,
+                        isEditMode: gameManager.isEditMode,
+                        onDelete: { id in
+                            gameManager.deleteTile(id: id)
+                        }
+                    )
                 }
                 
-                // Game message overlay
-                if gameManager.showOverlayMessage {
-                    Text(gameManager.overlayMessage)
-                        .font(.system(size: min(50, side/5), weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.5))
-                                .shadow(radius: 5)
-                        )
-                        .transition(.scale.combined(with: .opacity))
-                        .zIndex(100) // Ensure it's above all other elements
-                }
             }
             .frame(width: side, height: side)
             .background(Color.gray.opacity(0.3))
@@ -268,17 +273,17 @@ struct ContentView: View {
             Image(systemName: "gear")
         }
         .keyboardShortcut(",", modifiers: [.command])
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [64.colorForValue, 32768.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 55
-        )
+//        .gameButtonStyle(
+//            gradient: LinearGradient(
+//                gradient: Gradient(
+//                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+//                ),
+//                startPoint: .topLeading,
+//                endPoint: .bottomTrailing
+//            ),
+//            maxHeight: 55,
+//            minWidth: 55
+//        )
     }
     
     @ViewBuilder private var newButton: some View {
@@ -292,7 +297,7 @@ struct ContentView: View {
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [64.colorForValue, 8192.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -339,7 +344,7 @@ struct ContentView: View {
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [64.colorForValue, 256.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -353,12 +358,12 @@ struct ContentView: View {
     
     @ViewBuilder private var addFourButton: some View {
         Button(action: { gameManager.forceTile() }) {
-            Image(systemName: "4.circle")
+            Image(systemName: gameManager.gameLevel == .onlyTwos ? "2.circle" :  "4.circle")
         }
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [64.colorForValue, 2048.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -367,12 +372,30 @@ struct ContentView: View {
             minWidth: 100
         )
         .keyboardShortcut("4", modifiers: [.command])
+        .keyboardShortcut("2", modifiers: [.command])
     }
     
+    @ViewBuilder private var editButton: some View {
+            Button(action: { gameManager.toggleEditMode() }) {
+                Image(systemName: gameManager.isEditMode ? "pencil.slash" : "pencil")
+            }
+            .gameButtonStyle(
+                gradient: LinearGradient(
+                    gradient: Gradient(
+                        colors: gameManager.isEditMode ? [Color.red.opacity(0.7), Color.red] : [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+                    ),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                maxHeight: 55,
+                minWidth: 55
+            )
+            .keyboardShortcut("e", modifiers: [.command])
+        }
 
     private func startUndoTimer() {
         stopUndoTimer() // Ensure no existing timer is running
-        undoTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+        undoTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             Task { @MainActor in
                 gameManager.undo()
             }

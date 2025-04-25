@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct GameLevelPicker: View {
-    @ObservedObject var gameManager: GameManager
-    var showTitle = true
+    @EnvironmentObject var gameManager: GameManager
+    var showTitle: Bool = true
+    
+    init(showTitle: Bool = true) {
+        self.showTitle = showTitle
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -22,6 +26,7 @@ struct GameLevelPicker: View {
                     Text(level.description).tag(level)
                 }
             }
+            
 #if os(watchOS)
             .pickerStyle(InlinePickerStyle())
 #else

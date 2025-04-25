@@ -1,7 +1,7 @@
 import SwiftUI
 /// The main game view.
 struct ContentView: View {
-    @StateObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
 
     @State private var showScoreView = false // State to control ScoreView presentation
 
@@ -19,7 +19,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showScoreView) {
-            ScoreView(gameManager: gameManager) // Present the ScoreView
+            ScoreView() // Present the ScoreView
         }
     }
         

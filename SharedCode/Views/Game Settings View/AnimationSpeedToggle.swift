@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct AnimationSpeedToggle: View {
-    @ObservedObject var gameManager: GameManager
+    @EnvironmentObject var gameManager: GameManager
     var showTitle = true
     
     var body: some View {
-        VStack(alignment: .leading) {
+        HStack {
             if showTitle {
                 Text("Animation Levels").bold()
             }
             Toggle(isOn: $gameManager.fastAnimations) {
                 Label("Fast animations?", systemImage: "hare")
             }
-            .padding()
         }
+        .padding()
     }
 }
 

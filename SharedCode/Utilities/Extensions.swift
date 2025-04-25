@@ -28,7 +28,7 @@ extension Int {
         // 1) Compute which “step” we’re on
         let exponent = log2(Double(self))
         
-        // 2) Define how many steps until we sweep the full hue range.
+    // 2) Define how many steps until we sweep the full hue range.
         //    (e.g. 12 steps = one full cycle around the color wheel)
         let stepsPerCycle: Double = 24
         
