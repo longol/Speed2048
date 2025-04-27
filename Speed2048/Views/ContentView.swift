@@ -14,6 +14,8 @@ struct ContentView: View {
     
     @State private var undoTimer: Timer?
     
+    @State private var selectedTab: Int = 0
+    
     // Remove the hardcoded boardDimension constant and use a computed property instead
     var boardDimension: CGFloat {
         CGFloat(gameManager.boardSize)
@@ -23,20 +25,19 @@ struct ContentView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             headerView
-            
-#if os(macOS)
-            scoresViewMac
-#else
-            scoresView
-#endif
-            // statusMessage view removed - now handled by overlayMessageView
+            Divider()
+            scoresAndPickersTabView
+            Divider().padding()
+            Spacer()
+            overlayMessageView
             Spacer()
             gameButtonsView
+            Spacer()
             gameBoardView
             keyboardShortcuts
         }
 #if os(macOS)
-        .frame(minWidth: 400, minHeight: 500)
+        .frame(minWidth: 400, minHeight: 750)
 #endif
         .dynamicTypeSize(.xSmall ... .xxxLarge)
         .sheet(isPresented: $showSettings) {
@@ -47,32 +48,7 @@ struct ContentView: View {
                 await gameManager.saveGameState()
             }
         }
-    }
-    
-    @ViewBuilder private var keyboardShortcuts: some View {
-        Group {
-            Button("") {
-                Task {
-                    await gameManager.saveGameState()
-                }
-            }
-            .keyboardShortcut("s", modifiers: .command)
-            
-            Button("") {
-                Task {
-                    await gameManager.checkCloudVersion()
-                }
-            }
-            .keyboardShortcut("o", modifiers: .command)
-            Button("") {
-                Task {
-                    await gameManager.loadGameStateLocally()
-                }
-            }
-            .keyboardShortcut("l", modifiers: [.command])
-        }
-        .frame(width: 0, height: 0)
-        .hidden()
+        .background(gameManager.backgroundColor)
     }
     
     @ViewBuilder private var headerView: some View {
@@ -100,57 +76,129 @@ struct ContentView: View {
         }
     }
     
-    @ViewBuilder private var scoresViewMac: some View {
-        HStack(alignment: .top) {
-            scoresView
-            Spacer()
-            VStack(alignment: .leading) {
-                GameLevelPicker(showTitle: false)
-                BoardSizePicker(showTitle: false)
-//                AnimationSpeedToggle(showTitle: false)
+    @ViewBuilder private var scoresAndPickersTabView: some View {
+        VStack(spacing: 10) {
+            // Custom tab content with horizontal slide animation
+            GeometryReader { geo in
+                
+                HStack(spacing: 0) {
+                    Group {
+                        gameLevelsView
+                        visualSettingsView
+                        scoresView
+                    }
+                    .frame(width: geo.size.width)
+                }
+                .offset(x: -CGFloat(selectedTab) * geo.size.width)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedTab)
+                .gesture(
+                    DragGesture()
+                        .onEnded { value in
+                            let horizontalAmount = value.translation.width
+                            let pageWidth = geo.size.width / 2
+                            
+                            // Determine swipe direction and update tab if needed
+                            if horizontalAmount > pageWidth && selectedTab > 0 {
+                                selectedTab -= 1
+                            } else if horizontalAmount < -pageWidth && selectedTab < 2 {
+                                selectedTab += 1
+                            }
+                        }
+                )
             }
+            .frame(height: 90)
+            .padding(.horizontal)
+            .clipped() // Prevents content from visibly overflowing
+            
+            // Tab navigation
+            HStack {
+                Button(action: {
+                    if selectedTab > 0 { selectedTab -= 1 }
+                }) {
+                    Image(systemName: "chevron.left")
+                        .imageScale(.large)
+                        .opacity(selectedTab > 0 ? 1 : 0)
+                }
+//                .disabled(selectedTab == 0)
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                // Page indicators
+                HStack(spacing: 10) {
+                    ForEach(0..<3) { index in
+                        Circle()
+                            .fill(selectedTab == index ? Color.red : Color.gray)
+                            .frame(width: 8, height: 8)
+                            .onTapGesture {
+                                selectedTab = index
+                            }
+                    }
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    if selectedTab < 2 { selectedTab += 1 }
+                }) {
+                    Image(systemName: "chevron.right")
+                        .imageScale(.large)
+                        .opacity(selectedTab < 2 ? 1 : 0)
+                }
+//                .visible(selectedTab < 2)
+//                .disabled(selectedTab == 2)
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal)
+            .opacity(0.5)
+
         }
     }
     
     @ViewBuilder private var scoresView: some View {
         
-        let columnsTwo = [
+        let columns = [
+            GridItem(.flexible(), alignment: .leading),
+            GridItem(.flexible(), alignment: .leading),
             GridItem(.flexible(), alignment: .leading),
             GridItem(.flexible(), alignment: .leading),
         ]
-        
-        let columnsOne = [
-            GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .leading),
-        ]
-
         VStack {
             
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
-                scoreUnit(text: "Level", icon: "quotelevel", value: gameManager.gameLevel.description)
+            LazyVGrid(columns: columns, spacing: 10) {
                 scoreUnit(text: "Sum", icon: "sum", value: gameManager.totalScore.formatted())
-            }
-            
-            LazyVGrid(columns: columnsTwo, spacing: 10) {
-                
                 scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameManager.undosUsed.formatted())
                 scoreUnit(text:"+4s", icon: "4.circle", value: gameManager.manual4sUsed.formatted())
+                scoreUnit(text:"Deletes", icon: "trash", value: gameManager.deletedTilesCount.formatted())
             }
             
-            LazyVGrid(columns: columnsOne, spacing: 10) {
-                Label("Time:", systemImage: "clock")
-                    .font(.system(size: 18, weight: .bold))
-                Text(gameManager.seconds.formattedAsTime)
-                    .font(.system(size: 18, weight: .regular))
-            }
+            scoreUnit(text: "Time", icon: "clock", value: gameManager.seconds.formattedAsTime)
+            
+            
         }
         .padding()
-        
+    }
+
+    @ViewBuilder private var gameLevelsView: some View {
+        VStack {
+            GameLevelPicker()
+            BoardSizePicker()
+        }
+        .padding()
+    }
+
+    @ViewBuilder private var visualSettingsView: some View {
+        VStack {
+            AnimationSpeedToggle()
+            ColorPickerView()
+        }
+        .padding()
     }
     
     @ViewBuilder private func scoreUnit(text: String, icon: String, value: String) -> some View {
         HStack {
-            Label("\(text):", systemImage: icon)
+//            Label("\(text):", systemImage: icon)
+            Image(systemName: icon)
                 .font(.system(size: 18, weight: .bold))
             Text(value)
                 .font(.system(size: 18, weight: .regular))
@@ -167,8 +215,6 @@ struct ContentView: View {
                     .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
                 addFourButton
                 Spacer()
-                overlayMessageView
-                Spacer()
                 editButton
                 newButton
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
@@ -177,33 +223,23 @@ struct ContentView: View {
     }
 
     @ViewBuilder private var overlayMessageView: some View {
-        if gameManager.showOverlayMessage {
-            Group {
-                if gameManager.isSystemMessage {
-                    // System message style (former status message)
-                    HStack {
-                        Label(gameManager.overlayMessage, systemImage: "bolt.horizontal.icloud")
-                        ProgressView()
-                            .scaleEffect(0.5)
-                    }
-                    .font(.callout)
-                    .foregroundStyle(.gray.opacity(0.8))
-                    .padding(6)
-                } else {
-                    // Game message style (former overlay message)
+            VStack(alignment: .center) {
+                if gameManager.showOverlayMessage {
                     Text(gameManager.overlayMessage)
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.black)
                         .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.gray.opacity(0.5))
+                                .shadow(radius: 5)
+                        )
+                        .transition(.scale.combined(with: .opacity))
+                } else {
+                    EmptyView()
                 }
             }
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.white.opacity(0.5))
-                    .shadow(radius: gameManager.isSystemMessage ? 3 : 5)
-            )
-            .transition(.scale.combined(with: .opacity))
-            .zIndex(100) // Ensure it's above all other elements
-        }
+            .frame(height: 50)
+            .padding(.vertical, 10)
     }
     
     @ViewBuilder private var gameBoardView: some View {
@@ -273,17 +309,6 @@ struct ContentView: View {
             Image(systemName: "gear")
         }
         .keyboardShortcut(",", modifiers: [.command])
-//        .gameButtonStyle(
-//            gradient: LinearGradient(
-//                gradient: Gradient(
-//                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
-//                ),
-//                startPoint: .topLeading,
-//                endPoint: .bottomTrailing
-//            ),
-//            maxHeight: 55,
-//            minWidth: 55
-//        )
     }
     
     @ViewBuilder private var newButton: some View {
@@ -297,7 +322,7 @@ struct ContentView: View {
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -344,7 +369,7 @@ struct ContentView: View {
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -363,7 +388,7 @@ struct ContentView: View {
         .gameButtonStyle(
             gradient: LinearGradient(
                 gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
                 ),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -382,7 +407,7 @@ struct ContentView: View {
             .gameButtonStyle(
                 gradient: LinearGradient(
                     gradient: Gradient(
-                        colors: gameManager.isEditMode ? [Color.red.opacity(0.7), Color.red] : [gameManager.highestTileValue.colorForValue, 2.colorForValue]
+                        colors: gameManager.isEditMode ? [Color.red.opacity(0.7), Color.red] : [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
                     ),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -393,6 +418,31 @@ struct ContentView: View {
             .keyboardShortcut("e", modifiers: [.command])
         }
 
+    @ViewBuilder private var keyboardShortcuts: some View {
+        Group {
+            Button("") {
+                Task {
+                    await gameManager.saveGameState()
+                }
+            }
+            .keyboardShortcut("s", modifiers: .command)
+            
+            Button("") {
+                Task {
+                    await gameManager.checkCloudVersion()
+                }
+            }
+            .keyboardShortcut("o", modifiers: .command)
+            Button("") {
+                Task {
+                    await gameManager.loadGameStateLocally()
+                }
+            }
+            .keyboardShortcut("l", modifiers: [.command])
+        }
+        .frame(width: 0, height: 0)
+        .hidden()
+    }
     private func startUndoTimer() {
         stopUndoTimer() // Ensure no existing timer is running
         undoTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in

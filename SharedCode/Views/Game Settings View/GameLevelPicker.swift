@@ -9,39 +9,22 @@ import SwiftUI
 
 struct GameLevelPicker: View {
     @EnvironmentObject var gameManager: GameManager
-    var showTitle: Bool = true
     
-    init(showTitle: Bool = true) {
-        self.showTitle = showTitle
-    }
-
     var body: some View {
-        VStack(alignment: .leading) {
-            
-            if showTitle {
-                Text("Game Level").bold()
-            }
-            Picker("Game Level", selection: $gameManager.gameLevel) {
+        HStack {
+            Picker(selection: $gameManager.gameLevel) {
                 ForEach(GameLevel.allCases, id: \.self) { level in
                     Text(level.description).tag(level)
                 }
+            } label: {
+                Label("Level", systemImage: "gearshift.layout.sixspeed")
+                    .bold()
             }
-            
 #if os(watchOS)
             .pickerStyle(InlinePickerStyle())
 #else
             .pickerStyle(SegmentedPickerStyle())
 #endif
-            
-            if showTitle {
-                HStack {
-                    Spacer()
-                    Text(gameManager.gameLevel.penaltyString)
-                        .font(.caption)
-                    Spacer()
-                }
-            }
         }
-        .padding()
     }
 }

@@ -22,45 +22,39 @@ class GameManager: ObservableObject {
     @Published var undosUsed: Int = 0
     @Published var manual4sUsed: Int = 0
     @Published var isEditMode: Bool = false
+    @Published var deletedTilesCount: Int = 0
+    @Published var backgroundColor: Color = Color.blue.opacity(0.2)
     @Published var boardSize: Int = 4 {
         didSet {
             if oldValue != boardSize {
                 boardLogic = BoardLogic(boardSize: boardSize)
-                adaptTilesToNewBoardSize(oldSize: oldValue)
             }
         }
     }
     @Published var previousHighMerge: Int = 128
-    @Published var exponentialValue: Int = 2
     var highestTileValue: Int {
         return tiles.map { $0.value }.max() ?? 2
     }
     
     // UI state
+    @Published var statusMessage: String = ""
     @Published var showVersionChoiceAlert: Bool = false
     @Published var loadingGame: Bool = true
 
     // Overlay message state
     @Published var overlayMessage: String = ""
     @Published var showOverlayMessage: Bool = false
-    @Published var isSystemMessage: Bool = false // Flag to differentiate system status messages
     private var overlayMessageTask: Task<Void, Never>? = nil
     
     // Private state
     private var fetchedCloudGameState: GameState? = nil
     private var timer: Timer? = nil
     
-    
-    // Game animation state
-    enum GameAnimationState {
-        case idle
-        case animatingMove
-        case animatingMerge
-    }
-    
     private var animationState: GameAnimationState = .idle
     
     var gameState: GameState {
+        let (r, g, b, a) = backgroundColor.components
+
         return GameState(
             tiles: tiles,
             seconds: seconds,
@@ -69,7 +63,12 @@ class GameManager: ObservableObject {
             fastAnimations: fastAnimations,
             undosUsed: undosUsed,
             manual4sUsed: manual4sUsed,
-            boardSize: boardSize
+            boardSize: boardSize,
+            deletedTilesCount: deletedTilesCount,
+            backgroundColorRed: r,
+            backgroundColorGreen: g,
+            backgroundColorBlue: b,
+            backgroundColorOpacity: a
         )
     }
     
@@ -87,14 +86,14 @@ class GameManager: ObservableObject {
             } else {
                 loadingGame = false
 //                newGame()
-//                showSystemMessage("Started new game")
+//                showGameMessage("Started new game")
             }
         }
     }
     
     // MARK: - Game Data Management
     func checkCloudVersion() async {
-        showSystemMessage("Checking cloud")
+        showGameMessage("Checking cloud")
         do {
             let cloudState = try await dataManager.fetchGameStateFromCloud()
             let cloudTotalScore = cloudState.tiles.reduce(0) { $0 + $1.value }
@@ -102,49 +101,49 @@ class GameManager: ObservableObject {
             if cloudTotalScore > totalScore {
                 fetchedCloudGameState = cloudState
                 self.showVersionChoiceAlert = true
-                showSystemMessage("Found higher scored game")
+                showGameMessage("Found higher scored game")
             } else {
-                showSystemMessage("Local game is current")
+                showGameMessage("Local game is current")
             }
         } catch {
-            showSystemMessage(error.localizedDescription)
+            showGameMessage(error.localizedDescription)
         }
     }
     
     func loadGameStateLocally() async -> Bool {
-        showSystemMessage("Loading local game")
+        showGameMessage("Loading local game")
         do {
             let gameState = try await dataManager.loadGameStateLocally()
             applyGameState(gameState)
-            showSystemMessage("Loaded local game")
+            showGameMessage("Loaded local game")
             return true
         } catch {
-            showSystemMessage("Failed to load: \(error.localizedDescription)")
+            showGameMessage("Failed to load: \(error.localizedDescription)")
             return false
         }
     }
     
     func saveGameState() async {
         stopTimer()
-        showSystemMessage("Saving game")
+        showGameMessage("Saving game")
         do {
             try await dataManager.saveGameStateLocally(gameState: gameState)
-            showSystemMessage("Saved locally, now saving to cloud")
+            showGameMessage("Saved locally, now saving to cloud")
             try await dataManager.saveGameStateToCloud(gameState: gameState)
-            showSystemMessage("Saved to cloud")
+            showGameMessage("Saved to cloud")
         } catch {
-            showSystemMessage(error.localizedDescription)
+            showGameMessage(error.localizedDescription)
         }
     }
     
     func applyVersionChoice(useCloud: Bool) {
         if useCloud, let cloudGameState = fetchedCloudGameState {
-            showSystemMessage("Applying cloud version")
+            showGameMessage("Applying cloud version")
             applyGameState(cloudGameState)
         } else if !useCloud {
-            showSystemMessage("Keeping local version")
+            showGameMessage("Keeping local version")
         } else {
-            showSystemMessage("Game up to date")
+            showGameMessage("Game up to date")
         }
         // Reset temporary variables.
         showVersionChoiceAlert = false
@@ -160,7 +159,14 @@ class GameManager: ObservableObject {
         undosUsed = gameState.undosUsed
         manual4sUsed = gameState.manual4sUsed
         boardSize = gameState.boardSize
-        
+        deletedTilesCount = gameState.deletedTilesCount
+        backgroundColor = Color(
+            red: gameState.backgroundColorRed,
+            green: gameState.backgroundColorGreen,
+            blue: gameState.backgroundColorBlue,
+            opacity: gameState.backgroundColorOpacity
+        )
+
         if !tiles.isEmpty {
             startTimer()
         }
@@ -175,31 +181,6 @@ class GameManager: ObservableObject {
         return undosUsed + manual4sUsed
     }
     
-    // Replace updateStatusMessage with showSystemMessage
-    func showSystemMessage(_ message: String) {
-        print("SYSTEM: \(message)")
-        
-        // Cancel any existing message task
-        overlayMessageTask?.cancel()
-        
-        // Set and show the new message
-        overlayMessage = message
-        isSystemMessage = true
-        showOverlayMessage = true
-        
-        // Create a new task to hide the message after the specified duration
-        overlayMessageTask = Task {
-            do {
-                try await Task.sleep(for: .seconds(2.0))
-                if !Task.isCancelled {
-                    showOverlayMessage = false
-                    isSystemMessage = false
-                }
-            } catch {
-                // Task was cancelled, do nothing
-            }
-        }
-    }
     
     // MARK: - Timer Management
     func startTimer() {
@@ -386,11 +367,10 @@ class GameManager: ObservableObject {
         
         // Set and show the new message
         overlayMessage = message
-        isSystemMessage = false
         showOverlayMessage = true
         
         // Create a new task to hide the message after the specified duration
-        overlayMessageTask = Task {
+        overlayMessageTask = Task { @MainActor in
             do {
                 try await Task.sleep(for: .seconds(duration))
                 if !Task.isCancelled {
@@ -402,27 +382,5 @@ class GameManager: ObservableObject {
         }
     }
     
-    // MARK: - Board Size Management
-    private func adaptTilesToNewBoardSize(oldSize: Int) {
-        // Keep only tiles that fit within the new board dimensions
-        let filteredTiles = tiles.filter { tile in
-            return tile.row < boardSize && tile.col < boardSize
-        }
-        
-        // Update the tiles array with only valid tiles
-        tiles = filteredTiles
-        
-        // If we have fewer than 2 tiles after resizing, add some random tiles
-        let minimumTiles = 2
-        if tiles.count < minimumTiles {
-            let tilesToAdd = minimumTiles - tiles.count
-            for _ in 0..<tilesToAdd {
-                addRandomTile()
-            }
-        }
-        
-        // Show a message about the board size change
-        showGameMessage("Board resized to \(boardSize)×\(boardSize)")
-    }
 }
 

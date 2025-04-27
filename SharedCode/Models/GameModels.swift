@@ -9,6 +9,11 @@ struct GameState: Codable, Equatable {
     var undosUsed: Int
     var manual4sUsed: Int
     var boardSize: Int
+    var deletedTilesCount: Int
+    var backgroundColorRed: Double = 0.0
+    var backgroundColorGreen: Double = 0.0
+    var backgroundColorBlue: Double = 0.5
+    var backgroundColorOpacity: Double = 0.2
 }
 
 struct Tile: Codable, Identifiable, Equatable {
@@ -28,6 +33,12 @@ enum Direction {
     case up, down, left, right
 }
 
+enum GameAnimationState {
+    case idle
+    case animatingMove
+    case animatingMerge
+}
+
 enum GameLevel: String, Codable, CaseIterable {
     case onlyTwos
     case regular
@@ -37,13 +48,13 @@ enum GameLevel: String, Codable, CaseIterable {
     var description: String {
         switch self {
         case .onlyTwos:
-            return "Only 2s"
+            return "2s"
         case .regular:
-            return "2s > 4s"
+            return "More 2s"
         case .easy:
-            return "2s < 4s"
+            return "More 4s"
         case .onlyFours:
-            return "Only 4s"
+            return "4s"
         }
     }
     

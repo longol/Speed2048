@@ -55,3 +55,24 @@ extension Double {
 
 
 
+#if canImport(UIKit)
+import UIKit
+extension Color {
+    var components: (red: Double, green: Double, blue: Double, opacity: Double) {
+        let uiColor = UIColor(self)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (Double(r), Double(g), Double(b), Double(a))
+    }
+}
+#elseif canImport(AppKit)
+import AppKit
+extension Color {
+    var components: (red: Double, green: Double, blue: Double, opacity: Double) {
+        let nsColor = NSColor(self)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (Double(r), Double(g), Double(b), Double(a))
+    }
+}
+#endif

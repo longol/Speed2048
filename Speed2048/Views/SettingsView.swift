@@ -13,19 +13,6 @@ struct SettingsView: View {
         ScrollView {
             
             header
-            
-            Divider()
-            
-            GameLevelPicker()
-            
-            Divider()
-            
-            BoardSizePicker()
-            
-
-            Divider()
-            
-            AnimationSpeedToggle()
 
             Divider()
             
@@ -64,39 +51,19 @@ struct SettingsView: View {
                 Text("Cloud Sync").bold()
                 Spacer()
             }
+            
+#if os(macOS)
             HStack {
-                
-                Button {
-                    Task {
-                        await gameManager.saveGameState()
-                    }
-                } label: {
-                    Label("Cloud Save", systemImage: "icloud.and.arrow.up")
-                }
-                .keyboardShortcut("s", modifiers: [.command])
-                
-                Button {
-                    gameManager.applyVersionChoice(useCloud: true)
-                } label: {
-                    Label("Cloud Game ", systemImage: "icloud.and.arrow.down")
-                }
-                .keyboardShortcut("o", modifiers: [.command])
-                
-                Button {
-                    Task {
-                        await gameManager.loadGameStateLocally()
-                    }
-                } label: {
-                    Label("Local Game", systemImage: "externaldrive")
-                }
-                .keyboardShortcut("l", modifiers: [.command])
-                
+                cloudSyncButtons
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(!gameManager.overlayMessage.isEmpty)
+#else
+            VStack {
+                cloudSyncButtons
+            }
+#endif
             
             HStack {
-                if !gameManager.overlayMessage.isEmpty {
+                if gameManager.showOverlayMessage {
                     Label(gameManager.overlayMessage, systemImage: "bolt.horizontal.icloud")
                     ProgressView()
                         .scaleEffect(0.5)
@@ -108,9 +75,40 @@ struct SettingsView: View {
             .foregroundStyle(.gray)
             .frame(height: 20)
             
-            
         }
     }
+    
+    @ViewBuilder private var cloudSyncButtons: some View {
+        Group {
+            Button {
+                Task {
+                    await gameManager.saveGameState()
+                }
+            } label: {
+                Label("Cloud Save", systemImage: "icloud.and.arrow.up")
+            }
+            .keyboardShortcut("s", modifiers: [.command])
+            
+            Button {
+                gameManager.applyVersionChoice(useCloud: true)
+            } label: {
+                Label("Cloud Game ", systemImage: "icloud.and.arrow.down")
+            }
+            .keyboardShortcut("o", modifiers: [.command])
+            
+            Button {
+                Task {
+                    await gameManager.loadGameStateLocally()
+                }
+            } label: {
+                Label("Local Game", systemImage: "externaldrive")
+            }
+            .keyboardShortcut("l", modifiers: [.command])
+        }
+        .buttonStyle(.borderedProminent)
+
+    }
+
     
     @ViewBuilder private var perfectBoardView: some View {
         HStack {
