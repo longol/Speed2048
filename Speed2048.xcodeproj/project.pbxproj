@@ -25,18 +25,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A8452E392DB2E38D00E402F7 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
+		A83BB10E2DBED5D6006E4527 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Game/DataManager.swift,
 				Game/GameManager.swift,
-				Utilities/DataManager.swift,
 				Utilities/Extensions.swift,
 				Utilities/ViewModifiers.swift,
 				"Views/Game Settings View/AnimationSpeedToggle.swift",
 				"Views/Game Settings View/BoardSizePicker.swift",
 				"Views/Game Settings View/ColorPickerView.swift",
+				"Views/Game Settings View/ColorThemePresets.swift",
 				"Views/Game Settings View/GameLevelPicker.swift",
-				Views/TileModelView.swift,
+				"Views/Game Settings View/TileColorPreviewView.swift",
+				Views/TileView.swift,
 			);
 			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
 		};
@@ -50,10 +52,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A8452E2B2DB2E38D00E402F7 /* SharedCode */ = {
+		A83BB0F82DBED5D6006E4527 /* SharedCode */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A8452E392DB2E38D00E402F7 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */,
+				A83BB10E2DBED5D6006E4527 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */,
 			);
 			path = SharedCode;
 			sourceTree = "<group>";
@@ -94,10 +96,10 @@
 		A85FA92A2D9CE3A800959E76 = {
 			isa = PBXGroup;
 			children = (
-				A8452E2B2DB2E38D00E402F7 /* SharedCode */,
 				A85FA9352D9CE3A800959E76 /* Speed2048 */,
 				A8C37A332DA5D35100A76CCD /* Speed2048Watch Watch App */,
 				A85FA9342D9CE3A800959E76 /* Products */,
+				A83BB0F82DBED5D6006E4527 /* SharedCode */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,7 +129,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A8452E2B2DB2E38D00E402F7 /* SharedCode */,
+				A83BB0F82DBED5D6006E4527 /* SharedCode */,
 				A85FA9352D9CE3A800959E76 /* Speed2048 */,
 			);
 			name = Speed2048;

@@ -24,7 +24,8 @@ class GameManager: ObservableObject {
     @Published var isEditMode: Bool = false
     @Published var deletedTilesCount: Int = 0
     @Published var backgroundColor: Color = Color.blue.opacity(0.2)
-    @Published var fontColor: Color = .black 
+    @Published var uiSize: UISizes = .medium
+    @Published var fontColor: Color = .black
     @Published var boardSize: Int = 4 {
         didSet {
             if oldValue != boardSize {
@@ -68,6 +69,7 @@ class GameManager: ObservableObject {
             manual4sUsed: manual4sUsed,
             boardSize: boardSize,
             deletedTilesCount: deletedTilesCount,
+            uiSize: uiSize,
             backgroundColorRed: r,
             backgroundColorGreen: g,
             backgroundColorBlue: b,

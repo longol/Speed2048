@@ -10,6 +10,7 @@ struct GameState: Codable, Equatable {
     var manual4sUsed: Int
     var boardSize: Int
     var deletedTilesCount: Int
+    var uiSize: UISizes
     var backgroundColorRed: Double = 0.0
     var backgroundColorGreen: Double = 0.0
     var backgroundColorBlue: Double = 0.5
@@ -43,33 +44,34 @@ enum GameAnimationState {
     case animatingMerge
 }
 
-enum UISizes {
-    case small
-    case medium
-    case large
+enum UISizes: String, Codable, CaseIterable {
+    case small = "Small"
+    case medium = "Medium"
+    case large = "Large"
     
     var minWidth: CGFloat {
         switch self {
-        case .small: return 50
-        case .medium: return 80
-        case .large: return 120
+        case .small: return 40
+        case .medium: return 60
+        case .large: return 80
         }
     }
     var maxHeight: CGFloat {
         switch self {
-        case .small: return 50
-        case .medium: return 80
-        case .large: return 120
+        case .small: return 40
+        case .medium: return 60
+        case .large: return 80
         }
     }
     var fontSize: CGFloat {
         switch self {
-        case .small: return 20
-        case .medium: return 26
-        case .large: return 30
+        case .small: return 16
+        case .medium: return 20
+        case .large: return 24
         }
     }
 }
+
 
 enum GameDataManagementError: Error {
     case decodingError

@@ -16,7 +16,6 @@ struct ContentView: View {
     
     @State private var selectedTab: Int = 0
     
-    // Remove the hardcoded boardDimension constant and use a computed property instead
     var boardDimension: CGFloat {
         CGFloat(gameManager.boardSize)
     }
@@ -27,7 +26,6 @@ struct ContentView: View {
             headerView
             Divider()
             scoresAndPickersTabView
-            Divider().padding()
             Spacer()
             overlayMessageView
             Spacer()
@@ -49,6 +47,7 @@ struct ContentView: View {
             }
         }
         .background(gameManager.backgroundColor)
+        .foregroundStyle(gameManager.fontColor)
     }
     
     @ViewBuilder private var headerView: some View {
@@ -78,102 +77,113 @@ struct ContentView: View {
     
     @ViewBuilder private var scoresAndPickersTabView: some View {
         VStack(spacing: 10) {
-            // Custom tab content with horizontal slide animation
-            GeometryReader { geo in
+            // Main tab content with side buttons
+            HStack(spacing: 0) {
+                // Left button now aligned with content
+                leftIndexButton
+                    .padding(.leading)
                 
-                HStack(spacing: 0) {
-                    Group {
-                        gameLevelsView
-                        visualSettingsView
-                        scoresView
-                    }
-                    .frame(width: geo.size.width)
-                }
-                .offset(x: -CGFloat(selectedTab) * geo.size.width)
-                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedTab)
-                .gesture(
-                    DragGesture()
-                        .onEnded { value in
-                            let horizontalAmount = value.translation.width
-                            let pageWidth = geo.size.width / 2
-                            
-                            // Determine swipe direction and update tab if needed
-                            if horizontalAmount > pageWidth && selectedTab > 0 {
-                                selectedTab -= 1
-                            } else if horizontalAmount < -pageWidth && selectedTab < 2 {
-                                selectedTab += 1
-                            }
+                // Custom tab content with horizontal slide animation
+                GeometryReader { geo in
+                    HStack(spacing: 0) {
+                        Group {
+                            gameLevelsView
+                            visualSettingsView
+                            scoresView
                         }
-                )
+                        .frame(width: geo.size.width)
+                    }
+                    .offset(x: -CGFloat(selectedTab) * geo.size.width)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedTab)
+                    .gesture(
+                        DragGesture()
+                            .onEnded { value in
+                                let horizontalAmount = value.translation.width
+                                let pageWidth = geo.size.width / 2
+                                
+                                // Determine swipe direction and update tab if needed
+                                if horizontalAmount > pageWidth && selectedTab > 0 {
+                                    selectedTab -= 1
+                                } else if horizontalAmount < -pageWidth && selectedTab < 2 {
+                                    selectedTab += 1
+                                }
+                            }
+                    )
+                }
+                .clipped() // Prevents content from visibly overflowing
+                
+                // Right button now aligned with content
+                rightIndexButton
+                    .padding(.trailing)
             }
             .frame(height: 90)
-            .padding(.horizontal)
-            .clipped() // Prevents content from visibly overflowing
             
-            // Tab navigation
-            HStack {
-                Button(action: {
-                    if selectedTab > 0 { selectedTab -= 1 }
-                }) {
-                    Image(systemName: "chevron.left")
-                        .imageScale(.large)
-                        .opacity(selectedTab > 0 ? 1 : 0)
-                }
-//                .disabled(selectedTab == 0)
-                .buttonStyle(.plain)
-                
-                Spacer()
-                
-                // Page indicators
-                HStack(spacing: 10) {
-                    ForEach(0..<3) { index in
-                        Circle()
-                            .fill(selectedTab == index ? Color.red : Color.gray)
-                            .frame(width: 8, height: 8)
-                            .onTapGesture {
-                                selectedTab = index
-                            }
-                    }
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    if selectedTab < 2 { selectedTab += 1 }
-                }) {
-                    Image(systemName: "chevron.right")
-                        .imageScale(.large)
-                        .opacity(selectedTab < 2 ? 1 : 0)
-                }
-//                .visible(selectedTab < 2)
-//                .disabled(selectedTab == 2)
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal)
-            .opacity(0.5)
+            // Page indicators now in their own row
+            pageIndicatorsView
+                .padding(.bottom, 8)
+                .opacity(0.5)
+        }
+        .padding(.horizontal)
+    }
+    
+    @ViewBuilder private var leftIndexButton: some View {
+        Button(action: {
+            selectedTab = selectedTab > 0 ? selectedTab - 1 : 2
+        }) {
+            Image(systemName: "chevron.left")
+                .imageScale(.large)
+        }
+        .buttonStyle(.plain)
+    }
 
+    @ViewBuilder private var rightIndexButton: some View {
+        Button(action: {
+            selectedTab = selectedTab < 2 ? selectedTab + 1 : 0
+        }) {
+            Image(systemName: "chevron.right")
+                .imageScale(.large)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder private var pageIndicatorsView: some View {
+        HStack(spacing: 10) {
+            ForEach(0..<3) { index in
+                Circle()
+                    .fill(selectedTab == index ? Color.red : Color.gray)
+                    .frame(width: 8, height: 8)
+                    .onTapGesture {
+                        selectedTab = index
+                    }
+            }
         }
     }
     
     @ViewBuilder private var scoresView: some View {
         
-        let columns = [
-            GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .leading),
+        let columns3 = [
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
         ]
-        VStack {
-            
-            LazyVGrid(columns: columns, spacing: 10) {
+        let columns2 = [
+            GridItem(.flexible(), alignment: .center),
+            GridItem(.flexible(), alignment: .center),
+        ]
+        
+        VStack(alignment: .center) {
+            LazyVGrid(columns: columns2, spacing: 10) {
+                scoreUnit(text: "Time", icon: "clock", value: gameManager.seconds.formattedAsTime)
                 scoreUnit(text: "Sum", icon: "sum", value: gameManager.totalScore.formatted())
+            }
+
+            Divider()
+            
+            LazyVGrid(columns: columns3, spacing: 10) {
                 scoreUnit(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameManager.undosUsed.formatted())
                 scoreUnit(text:"+4s", icon: "4.circle", value: gameManager.manual4sUsed.formatted())
                 scoreUnit(text:"Deletes", icon: "trash", value: gameManager.deletedTilesCount.formatted())
             }
-            
-            scoreUnit(text: "Time", icon: "clock", value: gameManager.seconds.formattedAsTime)
-            
             
         }
         .padding()
@@ -265,6 +275,7 @@ struct ContentView: View {
                         tile: tile,
                         cellSize: cellSize,
                         isEditMode: gameManager.isEditMode,
+                        themeColor: gameManager.backgroundColor,
                         onDelete: { id in
                             gameManager.deleteTile(id: id)
                         }
@@ -319,16 +330,10 @@ struct ContentView: View {
             Image(systemName: "plus.circle")
         }
         .keyboardShortcut("n", modifiers: [.command])
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 55
+        .themeAwareButtonStyle(
+            themeBackground: gameManager.backgroundColor,
+            themeFontColor: gameManager.fontColor,
+            uiSize: gameManager.uiSize
         )
         .alert(isPresented: $showAlert) {
             Alert(
@@ -366,16 +371,10 @@ struct ContentView: View {
             },
             perform: {}
         )
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 100
+        .themeAwareButtonStyle(
+            themeBackground: gameManager.backgroundColor,
+            themeFontColor: gameManager.fontColor,
+            uiSize: gameManager.uiSize
         )
         .keyboardShortcut("z", modifiers: [.command])
         
@@ -385,16 +384,10 @@ struct ContentView: View {
         Button(action: { gameManager.forceTile() }) {
             Image(systemName: gameManager.gameLevel == .onlyTwos ? "2.circle" :  "4.circle")
         }
-        .gameButtonStyle(
-            gradient: LinearGradient(
-                gradient: Gradient(
-                    colors: [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            maxHeight: 55,
-            minWidth: 100
+        .themeAwareButtonStyle(
+            themeBackground: gameManager.backgroundColor,
+            themeFontColor: gameManager.fontColor,
+            uiSize: gameManager.uiSize
         )
         .keyboardShortcut("4", modifiers: [.command])
         .keyboardShortcut("2", modifiers: [.command])
@@ -404,16 +397,10 @@ struct ContentView: View {
             Button(action: { gameManager.toggleEditMode() }) {
                 Image(systemName: gameManager.isEditMode ? "pencil.slash" : "pencil")
             }
-            .gameButtonStyle(
-                gradient: LinearGradient(
-                    gradient: Gradient(
-                        colors: gameManager.isEditMode ? [Color.red.opacity(0.7), Color.red] : [gameManager.highestTileValue.colorForValue, 1000.colorForValue]
-                    ),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                maxHeight: 55,
-                minWidth: 55
+            .themeAwareButtonStyle(
+                themeBackground: gameManager.isEditMode ? Color.red.opacity(0.7) : gameManager.backgroundColor,
+                themeFontColor: gameManager.fontColor,
+                uiSize: gameManager.uiSize
             )
             .keyboardShortcut("e", modifiers: [.command])
         }
@@ -443,6 +430,7 @@ struct ContentView: View {
         .frame(width: 0, height: 0)
         .hidden()
     }
+    
     private func startUndoTimer() {
         stopUndoTimer() // Ensure no existing timer is running
         undoTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in

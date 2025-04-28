@@ -16,6 +16,18 @@ struct SettingsView: View {
 
             Divider()
             
+            ColorThemePresets()
+                .padding(.vertical)
+
+            TileColorPreviewView()
+                .padding(.bottom)
+
+            Divider()
+            
+            buttonSizeView
+            
+            Divider()
+
             cloudSyncSection
             
             Divider()
@@ -27,6 +39,8 @@ struct SettingsView: View {
             contactView
         }
         .padding()
+        .background(Color(gameManager.backgroundColor))
+        .foregroundStyle(gameManager.fontColor)
     }
     
     @ViewBuilder private var header: some View {
@@ -42,6 +56,23 @@ struct SettingsView: View {
                 Image(systemName: "xmark")
             }
             .padding(5)
+        }
+    }
+    
+    @ViewBuilder private var buttonSizeView: some View {
+        VStack(alignment: .center) {
+            HStack {
+                Text("Button Sizes").bold()
+                Spacer()
+            }
+            
+            Picker("Button Sizes", selection: $gameManager.uiSize) {
+                ForEach(UISizes.allCases, id: \.self) { size in
+                    Text(size.rawValue)
+                        .tag(size)
+                }
+            }
+            .pickerStyle(.segmented)
         }
     }
     
@@ -62,19 +93,17 @@ struct SettingsView: View {
             }
 #endif
             
-            HStack {
-                if gameManager.showOverlayMessage {
+            if gameManager.showOverlayMessage {
+                HStack {
                     Label(gameManager.overlayMessage, systemImage: "bolt.horizontal.icloud")
                     ProgressView()
                         .scaleEffect(0.5)
-                } else {
-                    Text("Save or load your game progress using iCloud.")
                 }
+                .font(.caption)
+                .foregroundStyle(.gray)
+                .frame(height: 20)
             }
-            .font(.caption)
-            .foregroundStyle(.gray)
-            .frame(height: 20)
-            
+
         }
     }
     
@@ -85,14 +114,14 @@ struct SettingsView: View {
                     await gameManager.saveGameState()
                 }
             } label: {
-                Label("Cloud Save", systemImage: "icloud.and.arrow.up")
+                Label("Save to Cloud", systemImage: "icloud.and.arrow.up")
             }
             .keyboardShortcut("s", modifiers: [.command])
             
             Button {
                 gameManager.applyVersionChoice(useCloud: true)
             } label: {
-                Label("Cloud Game ", systemImage: "icloud.and.arrow.down")
+                Label("Get Cloud Game ", systemImage: "icloud.and.arrow.down")
             }
             .keyboardShortcut("o", modifiers: [.command])
             
@@ -101,12 +130,15 @@ struct SettingsView: View {
                     await gameManager.loadGameStateLocally()
                 }
             } label: {
-                Label("Local Game", systemImage: "externaldrive")
+                Label("Load Local Game", systemImage: "externaldrive")
             }
             .keyboardShortcut("l", modifiers: [.command])
         }
-        .buttonStyle(.borderedProminent)
-
+        .themeAwareButtonStyle(
+            themeBackground: gameManager.isEditMode ? Color.red.opacity(0.7) : gameManager.backgroundColor,
+            themeFontColor: gameManager.fontColor,
+            uiSize: gameManager.uiSize
+        )
     }
 
     
@@ -140,7 +172,7 @@ struct SettingsView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(Color.blue)
-            .foregroundColor(.white)
+            .foregroundStyle(.white)
             .cornerRadius(5)
     }
 }

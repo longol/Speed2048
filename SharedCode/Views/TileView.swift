@@ -11,13 +11,14 @@ struct TileView: View {
     var tile: Tile
     var cellSize: CGFloat
     var isEditMode: Bool
+    var themeColor: Color = .blue.opacity(0.2)  // Default theme color
     var onDelete: ((UUID) -> Void)?
-    
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: cellSize * 0.1)
-                .fill(tile.value.colorForValue)
+                .fill(tile.value.colorForValue(baseColor: themeColor))
+
             Text("\(tile.value)")
 #if os(watchOS)
                 .font(.system(size: cellSize * 0.5, weight: .bold))
@@ -37,13 +38,12 @@ struct TileView: View {
                     : nil
                 )
                 .onTapGesture {
-                    if isEditMode, let onDelete = onDelete {
-                        onDelete(tile.id)
-                    }
+//                    if isEditMode, let onDelete = onDelete {
+//                        onDelete(tile.id)
+//                    }
                 }
         }
         .frame(width: cellSize - 4, height: cellSize - 4)
-        // The tile’s position is computed from its row/column.
         .position(x: CGFloat(tile.col) * cellSize + cellSize/2,
                   y: CGFloat(tile.row) * cellSize + cellSize/2)
         

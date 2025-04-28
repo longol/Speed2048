@@ -23,22 +23,32 @@ extension Int {
         return components.joined(separator: " ")
     }
     
-    var colorForValue: Color {
+    func colorForValue(baseColor: Color) -> Color {
+        // Get base color components
+        let (baseR, baseG, baseB, _) = baseColor.components
         
-        // 1) Compute which “step” we’re on
+        // Compute which "step" we're on
         let exponent = log2(Double(self))
         
-    // 2) Define how many steps until we sweep the full hue range.
-        //    (e.g. 12 steps = one full cycle around the color wheel)
+        // Define how many steps until we reach maximum saturation
         let stepsPerCycle: Double = 24
         
-        // 3) Compute hue in [0,1], wrapping around if exponent > stepsPerCycle
-        let hue = (exponent / stepsPerCycle).truncatingRemainder(dividingBy: 1.0)
-        
-        // 4) Optionally scale saturation & brightness so larger tiles look “hotter”
-        let saturation = Swift.min(1.0, 0.5 + exponent * 0.03)
+        // Use theme color as base, then adjust saturation/brightness based on value
+        let hue = (baseR + baseG + baseB) / 3.0 + (exponent / stepsPerCycle).truncatingRemainder(dividingBy: 0.5) - 0.25
+        let saturation = Swift.min(1.0, 0.6 + exponent * 0.03)
         let brightness = Swift.max(0.5, 1.0 - exponent * 0.04)
         
+        return Color(hue: hue.truncatingRemainder(dividingBy: 1.0),
+                    saturation: saturation,
+                    brightness: brightness)
+    }
+
+    var colorForValue: Color {
+        let exponent = log2(Double(self))
+        let stepsPerCycle: Double = 24
+        let hue = (exponent / stepsPerCycle).truncatingRemainder(dividingBy: 1.0)
+        let saturation = Swift.min(1.0, 0.5 + exponent * 0.03)
+        let brightness = Swift.max(0.5, 1.0 - exponent * 0.04)
         return Color(hue: hue, saturation: saturation, brightness: brightness)
     }
 
