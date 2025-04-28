@@ -26,6 +26,8 @@ class GameManager: ObservableObject {
     @Published var backgroundColor: Color = Color.blue.opacity(0.2)
     @Published var uiSize: UISizes = .medium
     @Published var fontColor: Color = .black
+    @Published var selectedThemeName: String = ""
+    @Published var baseButtonColor: Color = Color(red: 0.2, green: 0.5, blue: 0.8)
     @Published var boardSize: Int = 4 {
         didSet {
             if oldValue != boardSize {
@@ -58,6 +60,7 @@ class GameManager: ObservableObject {
     var gameState: GameState {
         let (r, g, b, a) = backgroundColor.components
         let (rf, gf, bf, af) = fontColor.components
+        let (rb, gb, bb, ab) = baseButtonColor.components
 
         return GameState(
             tiles: tiles,
@@ -70,6 +73,7 @@ class GameManager: ObservableObject {
             boardSize: boardSize,
             deletedTilesCount: deletedTilesCount,
             uiSize: uiSize,
+            selectedThemeName: selectedThemeName,
             backgroundColorRed: r,
             backgroundColorGreen: g,
             backgroundColorBlue: b,
@@ -77,7 +81,11 @@ class GameManager: ObservableObject {
             fontColorRed: rf,
             fontColorGreen: gf,
             fontColorBlue: bf,
-            fontColorOpacity: af
+            fontColorOpacity: af,
+            buttonBaseColorRed: rb,
+            buttonBaseColorGreen: gb,
+            buttonBaseColorBlue: bb,
+            buttonBaseColorOpacity: ab
         )
     }
     

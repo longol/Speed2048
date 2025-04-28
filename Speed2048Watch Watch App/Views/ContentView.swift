@@ -42,7 +42,12 @@ struct ContentView: View {
                 }
                 // Draw the tiles.
                 ForEach(gameManager.tiles) { tile in
-                    TileView(tile: tile, cellSize: cellSize)
+                    TileView(
+                        tile: tile,
+                        cellSize: cellSize,
+                        themeColor: gameManager.baseButtonColor
+                    )
+                        
                 }
             }
             .frame(width: side, height: side)

@@ -1,10 +1,5 @@
 import SwiftUI
 
-enum AnimationLevel: String, CaseIterable {
-    case smooth = "Smooth"
-    case fast = "Fast"
-}
-
 struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var gameManager: GameManager

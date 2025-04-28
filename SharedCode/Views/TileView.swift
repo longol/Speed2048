@@ -11,7 +11,7 @@ struct TileView: View {
     var tile: Tile
     var cellSize: CGFloat
     var isEditMode: Bool
-    var themeColor: Color = .blue.opacity(0.2)  // Default theme color
+    var themeColor: Color
     var onDelete: ((UUID) -> Void)?
 
     var body: some View {

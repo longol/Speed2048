@@ -20,7 +20,7 @@ struct TileColorPreviewView: View {
                     ForEach(sampleValues, id: \.self) { value in
                         ZStack {
                             RoundedRectangle(cornerRadius: 6)
-                                .fill(value.colorForValue(baseColor: gameManager.backgroundColor))
+                                .fill(value.colorForValue(baseColor: gameManager.baseButtonColor))
                             Text("\(value)")
                                 .font(.system(size: tileSize * 0.4, weight: .bold))
                                 .foregroundColor(.white)

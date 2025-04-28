@@ -28,16 +28,16 @@
 		A83BB10E2DBED5D6006E4527 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Game/DataManager.swift,
 				Game/GameManager.swift,
+				Utilities/DataManager.swift,
 				Utilities/Extensions.swift,
 				Utilities/ViewModifiers.swift,
-				"Views/Game Settings View/AnimationSpeedToggle.swift",
-				"Views/Game Settings View/BoardSizePicker.swift",
-				"Views/Game Settings View/ColorPickerView.swift",
-				"Views/Game Settings View/ColorThemePresets.swift",
-				"Views/Game Settings View/GameLevelPicker.swift",
-				"Views/Game Settings View/TileColorPreviewView.swift",
+				Views/AnimationSpeedToggle.swift,
+				Views/BoardSizePicker.swift,
+				Views/ColorPickerView.swift,
+				Views/ColorThemePresets.swift,
+				Views/GameLevelPicker.swift,
+				Views/TileColorPreviewView.swift,
 				Views/TileView.swift,
 			);
 			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
@@ -361,7 +361,7 @@
 				CODE_SIGN_ENTITLEMENTS = Speed2048/Speed2048.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Speed2048/Preview Content\"";
 				DEVELOPMENT_TEAM = 49RSWYZQ93;
@@ -384,7 +384,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 3;
+				MARKETING_VERSION = 4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -408,7 +408,7 @@
 				CODE_SIGN_ENTITLEMENTS = Speed2048/Speed2048.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Speed2048/Preview Content\"";
 				DEVELOPMENT_TEAM = 49RSWYZQ93;
@@ -431,7 +431,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 3;
+				MARKETING_VERSION = 4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lucaslongo.Speed2048;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

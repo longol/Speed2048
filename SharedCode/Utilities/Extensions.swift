@@ -42,18 +42,6 @@ extension Int {
                     saturation: saturation,
                     brightness: brightness)
     }
-
-    var colorForValue: Color {
-        let exponent = log2(Double(self))
-        let stepsPerCycle: Double = 24
-        let hue = (exponent / stepsPerCycle).truncatingRemainder(dividingBy: 1.0)
-        let saturation = Swift.min(1.0, 0.5 + exponent * 0.03)
-        let brightness = Swift.max(0.5, 1.0 - exponent * 0.04)
-        return Color(hue: hue, saturation: saturation, brightness: brightness)
-    }
-
-
-
 }
 
 

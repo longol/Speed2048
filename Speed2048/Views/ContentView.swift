@@ -275,7 +275,7 @@ struct ContentView: View {
                         tile: tile,
                         cellSize: cellSize,
                         isEditMode: gameManager.isEditMode,
-                        themeColor: gameManager.backgroundColor,
+                        themeColor: gameManager.baseButtonColor, // Change this from backgroundColor to baseButtonColor
                         onDelete: { id in
                             gameManager.deleteTile(id: id)
                         }
