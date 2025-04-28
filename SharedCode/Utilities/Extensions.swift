@@ -80,8 +80,14 @@ import AppKit
 extension Color {
     var components: (red: Double, green: Double, blue: Double, opacity: Double) {
         let nsColor = NSColor(self)
+        // Convert to RGB color space first
+        guard let rgbColor = nsColor.usingColorSpace(.sRGB) else {
+            // Fallback if conversion fails
+            return (0, 0, 0, 1)
+        }
+        
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        rgbColor.getRed(&r, green: &g, blue: &b, alpha: &a)
         return (Double(r), Double(g), Double(b), Double(a))
     }
 }

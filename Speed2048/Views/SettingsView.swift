@@ -61,16 +61,15 @@ struct SettingsView: View {
     
     @ViewBuilder private var buttonSizeView: some View {
         VStack(alignment: .center) {
-            HStack {
-                Text("Button Sizes").bold()
-                Spacer()
-            }
             
-            Picker("Button Sizes", selection: $gameManager.uiSize) {
+            Picker(selection: $gameManager.uiSize) {
                 ForEach(UISizes.allCases, id: \.self) { size in
                     Text(size.rawValue)
                         .tag(size)
                 }
+            } label: {
+                Label("Button Sizes", systemImage: "arrow.up.arrow.down")
+                    .bold()
             }
             .pickerStyle(.segmented)
         }
@@ -83,15 +82,7 @@ struct SettingsView: View {
                 Spacer()
             }
             
-#if os(macOS)
-            HStack {
-                cloudSyncButtons
-            }
-#else
-            VStack {
-                cloudSyncButtons
-            }
-#endif
+            cloudSyncButtons
             
             if gameManager.showOverlayMessage {
                 HStack {
@@ -101,7 +92,7 @@ struct SettingsView: View {
                 }
                 .font(.caption)
                 .foregroundStyle(.gray)
-                .frame(height: 20)
+//                .frame(height: 20)
             }
 
         }
