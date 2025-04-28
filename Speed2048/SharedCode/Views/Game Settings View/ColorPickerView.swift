@@ -28,4 +28,3 @@ struct ColorPickerView: View {
         }
     }
 }
-

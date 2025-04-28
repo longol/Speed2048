@@ -9,29 +9,6 @@ import SwiftUI
 import CloudKit
 
 
-enum GameDataManagementError: Error {
-    case decodingError
-    case cloudKitError
-    case cloudUserNotSetup
-    case noGameFound
-    case localSaveFailure
-    
-    var localizedDescription: String {
-        switch self {
-        case .decodingError:
-            return "decodingError"
-        case .cloudKitError:
-            return "cloudKitError"
-        case .cloudUserNotSetup:
-            return "cloudUserNotSetup"
-        case .noGameFound:
-            return "noGameFound"
-        case .localSaveFailure:
-            return "localSaveFailure"
-        }
-    }
-}
-
 class DataManager: ObservableObject {
    
     private let container = CKContainer(identifier: "iCloud.com.lucaslongo.Speed2048")

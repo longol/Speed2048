@@ -24,14 +24,14 @@ struct TileView: View {
 #else
                 .font(.system(size: cellSize * 0.25, weight: .bold))
 #endif
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
                 .minimumScaleFactor(0.05) // Adjust the scale factor as needed
                 .lineLimit(1) // Ensure the text is on a single line
                 .overlay(
                     isEditMode ?
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: cellSize * 0.3))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .opacity(0.8)
                         .offset(x: cellSize * 0.25, y: -cellSize * 0.25)
                     : nil
