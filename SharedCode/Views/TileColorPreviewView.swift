@@ -18,14 +18,19 @@ struct TileColorPreviewView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(sampleValues, id: \.self) { value in
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(value.colorForValue(baseColor: gameManager.baseButtonColor))
-                            Text("\(value)")
-                                .font(.system(size: tileSize * 0.4, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .frame(width: tileSize + 25, height: tileSize)
+                        Text("\(value)")
+                            .font(.system(size: tileSize * 0.4, weight: .bold))
+                            .foregroundColor(.white)
+                            .themeAwareButtonStyle(
+                                themeBackground: value
+                                    .colorForValue(
+                                        baseColor: gameManager.baseButtonColor
+                                    ),
+                                themeFontColor: gameManager.fontColor,
+                                uiSize: gameManager.uiSize,
+                                maxHeight: tileSize + 25,
+                                minWidth: tileSize + 25,
+                            )
                     }
                 }
                 .padding(.vertical, 4)

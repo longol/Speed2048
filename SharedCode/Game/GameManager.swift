@@ -82,10 +82,10 @@ class GameManager: ObservableObject {
             fontColorGreen: gf,
             fontColorBlue: bf,
             fontColorOpacity: af,
-            buttonBaseColorRed: rb,
-            buttonBaseColorGreen: gb,
-            buttonBaseColorBlue: bb,
-            buttonBaseColorOpacity: ab
+            baseButtonColorRed: rb,
+            baseButtonColorGreen: gb,
+            baseButtonColorBlue: bb,
+            baseButtonColorOpacity: ab
         )
     }
     
@@ -93,17 +93,13 @@ class GameManager: ObservableObject {
         Task {
             loadingGame = true
             
-            // First try to load the local game
             let loadedSuccessfully = await loadGameStateLocally()
             
-            // Only check cloud if we successfully loaded a local game
             if loadedSuccessfully {
                 await checkCloudVersion()
                 loadingGame = false
             } else {
                 loadingGame = false
-//                newGame()
-//                showGameMessage("Started new game")
             }
         }
     }
@@ -177,13 +173,26 @@ class GameManager: ObservableObject {
         manual4sUsed = gameState.manual4sUsed
         boardSize = gameState.boardSize
         deletedTilesCount = gameState.deletedTilesCount
+        uiSize = gameState.uiSize
+        selectedThemeName = gameState.selectedThemeName
         backgroundColor = Color(
             red: gameState.backgroundColorRed,
             green: gameState.backgroundColorGreen,
             blue: gameState.backgroundColorBlue,
             opacity: gameState.backgroundColorOpacity
         )
-
+        fontColor = Color(
+            red: gameState.fontColorRed,
+            green: gameState.fontColorGreen,
+            blue: gameState.fontColorBlue,
+            opacity: gameState.fontColorOpacity
+        )
+        baseButtonColor = Color(
+            red: gameState.baseButtonColorRed,
+            green: gameState.baseButtonColorGreen,
+            blue: gameState.baseButtonColorBlue,
+            opacity: gameState.baseButtonColorOpacity
+        )
         if !tiles.isEmpty {
             startTimer()
         }
@@ -259,9 +268,9 @@ class GameManager: ObservableObject {
         if animationState != .idle { return }
         
         // Save current state for undo
-        if undoStack.count > 20 {
-            undoStack.removeFirst()
-        }
+//        if undoStack.count > 20 {
+//            undoStack.removeFirst()
+//        }
         undoStack.append(tiles.map { $0 })
         
         let moveResult = boardLogic.calculateMoves(tiles: tiles, direction: direction)

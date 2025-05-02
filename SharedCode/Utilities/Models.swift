@@ -12,19 +12,19 @@ struct GameState: Codable, Equatable {
     var boardSize: Int
     var deletedTilesCount: Int
     var uiSize: UISizes
-    var selectedThemeName: String = ""
-    var backgroundColorRed: Double = 0.0
-    var backgroundColorGreen: Double = 0.0
-    var backgroundColorBlue: Double = 0.5
-    var backgroundColorOpacity: Double = 0.2
-    var fontColorRed: Double = 0.0
-    var fontColorGreen: Double = 0.0
-    var fontColorBlue: Double = 0.0
-    var fontColorOpacity: Double = 1.0
-    var buttonBaseColorRed: Double = 0.0
-    var buttonBaseColorGreen: Double = 0.0
-    var buttonBaseColorBlue: Double = 0.0
-    var buttonBaseColorOpacity: Double = 1.0
+    var selectedThemeName: String
+    var backgroundColorRed: Double
+    var backgroundColorGreen: Double
+    var backgroundColorBlue: Double
+    var backgroundColorOpacity: Double
+    var fontColorRed: Double
+    var fontColorGreen: Double
+    var fontColorBlue: Double
+    var fontColorOpacity: Double
+    var baseButtonColorRed: Double
+    var baseButtonColorGreen: Double
+    var baseButtonColorBlue: Double
+    var baseButtonColorOpacity: Double
 }
 
 struct Tile: Codable, Identifiable, Equatable {

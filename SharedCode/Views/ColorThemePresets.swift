@@ -10,24 +10,6 @@ import SwiftUI
 struct ColorThemePresets: View {
     @EnvironmentObject var gameManager: GameManager
     
-    // Define color theme pairs (background, font)
-//    let colorThemes: [(String, Color, Color)] = [
-//        ("Classic", Color.white.opacity(0.8), .black),
-//        ("Dark", Color.black.opacity(0.8), .white),
-//        ("Ocean", Color.blue.opacity(0.2), Color(red: 0, green: 0, blue: 0.5)),
-//        ("Forest", Color(red: 0.2, green: 0.5, blue: 0.2).opacity(0.2), Color(red: 0, green: 0.3, blue: 0)),
-//        ("Warm", Color(red: 1.0, green: 0.9, blue: 0.8).opacity(0.8), Color(red: 0.6, green: 0.3, blue: 0)),
-//        ("Lavender", Color(red: 0.8, green: 0.7, blue: 1.0).opacity(0.3), Color(red: 0.4, green: 0, blue: 0.6)),
-//        ("Sunset", Color(red: 1.0, green: 0.8, blue: 0.6).opacity(0.3), Color(red: 0.8, green: 0.4, blue: 0)),
-//        ("Cool", Color(red: 0.6, green: 0.8, blue: 1.0).opacity(0.3), Color(red: 0, green: 0.4, blue: 0.8)),
-//        ("Earthy", Color(red: 0.8, green: 0.7, blue: 0.5).opacity(0.3), Color(red: 0.5, green: 0.4, blue: 0)),
-//        ("Pastel", Color(red: 1.0, green: 0.8, blue: 0.9).opacity(0.3), Color(red: 0.8, green: 0.4, blue: 0.6)),
-//        ("Neon", Color(red: 1.0, green: 1.0, blue: 0.2).opacity(0.3), Color(red: 1.0, green: 0, blue: 1.0)),
-//        ("Retro", Color(red: 0.8, green: 0.5, blue: 0.2).opacity(0.3), Color(red: 0.5, green: 0.1, blue: 0.3)),
-//        ("Cyberpunk", Color(red: 0.2, green: 0.1, blue: 0.5).opacity(0.3), Color(red: 0.8, green: 0.2, blue: 1.0)),
-//        ("Monochrome", Color.gray.opacity(0.3), Color.black)
-//    ]
-    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Color Themes")
@@ -98,5 +80,6 @@ struct ThemeButton: View {
                 .fontWeight(isSelected ? .bold : .regular)
                 .underline(isSelected)
         }
+        .frame(width: 60)
     }
 }

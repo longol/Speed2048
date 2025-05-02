@@ -77,11 +77,9 @@ struct ContentView: View {
     
     @ViewBuilder private var scoresAndPickersTabView: some View {
         VStack(spacing: 10) {
-            // Main tab content with side buttons
             HStack(spacing: 0) {
-                // Left button now aligned with content
+
                 leftIndexButton
-                    .padding(.leading)
                 
                 // Custom tab content with horizontal slide animation
                 GeometryReader { geo in
@@ -112,9 +110,7 @@ struct ContentView: View {
                 }
                 .clipped() // Prevents content from visibly overflowing
                 
-                // Right button now aligned with content
                 rightIndexButton
-                    .padding(.trailing)
             }
             .frame(height: 90)
             

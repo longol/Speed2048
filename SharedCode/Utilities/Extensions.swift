@@ -27,16 +27,39 @@ extension Int {
         // Get base color components
         let (baseR, baseG, baseB, _) = baseColor.components
         
-        // Compute which "step" we're on
+        // Compute which "step" we're on (2, 4, 8, 16... etc)
         let exponent = log2(Double(self))
         
+        // For lowest values (2, 4), stay very close to base color
+        if exponent <= 2 {
+            // Convert RGB components to HSB for base color
+            var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+            #if canImport(UIKit)
+            UIColor(red: CGFloat(baseR), green: CGFloat(baseG), blue: CGFloat(baseB), alpha: 1.0).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+            #elseif canImport(AppKit)
+            NSColor(red: CGFloat(baseR), green: CGFloat(baseG), blue: CGFloat(baseB), alpha: 1.0).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+            #endif
+            
+            // Slightly adjust saturation and brightness for visual distinction
+            let satAdjust = 0.1 * exponent
+            let brightAdjust = 0.05 * exponent
+            
+            return Color(hue: Double(hue), 
+                         saturation: Swift.min(1.0, Double(saturation) + satAdjust),
+                         brightness: Swift.max(0.5, Double(brightness) - brightAdjust))
+        }
+        
+        // For higher values, gradually change color
         // Define how many steps until we reach maximum saturation
         let stepsPerCycle: Double = 24
         
-        // Use theme color as base, then adjust saturation/brightness based on value
-        let hue = (baseR + baseG + baseB) / 3.0 + (exponent / stepsPerCycle).truncatingRemainder(dividingBy: 0.5) - 0.25
-        let saturation = Swift.min(1.0, 0.6 + exponent * 0.03)
-        let brightness = Swift.max(0.5, 1.0 - exponent * 0.04)
+        // Gradually shift hue based on value
+        let hueShift = (exponent - 2) / stepsPerCycle * 0.5 // More gradual shift
+        let hue = (baseR + baseG + baseB) / 3.0 + hueShift
+        
+        // Increase saturation and adjust brightness as value grows
+        let saturation = Swift.min(1.0, 0.5 + exponent * 0.025)
+        let brightness = Swift.max(0.5, 1.0 - exponent * 0.03)
         
         return Color(hue: hue.truncatingRemainder(dividingBy: 1.0),
                     saturation: saturation,

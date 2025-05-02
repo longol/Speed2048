@@ -23,7 +23,7 @@ struct GameLevelPicker: View {
 #if os(watchOS)
             .pickerStyle(InlinePickerStyle())
 #else
-            .pickerStyle(SegmentedPickerStyle())
+            .pickerStyle(PalettePickerStyle())
 #endif
         }
     }

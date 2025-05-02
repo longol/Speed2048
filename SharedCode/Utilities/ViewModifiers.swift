@@ -11,6 +11,7 @@ struct GameButtonModifier: ViewModifier {
     let gradient: LinearGradient
     let maxHeight: CGFloat
     let minWidth: CGFloat
+    let maxWidth: CGFloat
     let fontSize: CGFloat
     let fontColor: Color
     
@@ -18,7 +19,7 @@ struct GameButtonModifier: ViewModifier {
         content
             .font(.system(size: fontSize, weight: .bold))
             .padding()
-            .frame(minWidth: minWidth, maxHeight: maxHeight)
+            .frame(minWidth: minWidth, maxWidth: maxWidth, maxHeight: maxHeight)
             .background(gradient)
             .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 4)
@@ -57,7 +58,10 @@ extension View {
     func themeAwareButtonStyle(
         themeBackground: Color,
         themeFontColor: Color,
-        uiSize: UISizes = .small
+        uiSize: UISizes = .small,
+        maxHeight: CGFloat = 0,
+        minWidth: CGFloat = 0,
+        maxWidth: CGFloat = 10,
     ) -> some View {
         // Create complementary colors based on the theme background
         let (r, g, b, a) = themeBackground.components
@@ -71,12 +75,7 @@ extension View {
         )
         
         // Create a slightly lighter variant for gradient
-        let lighterVariant = Color(
-            red: min(1.0, r + 0.1),
-            green: min(1.0, g + 0.1),
-            blue: min(1.0, b + 0.1),
-            opacity: min(1.0, a + 0.3)
-        )
+        let lighterVariant = Color.white.opacity(0.3)
         
         let gradient = LinearGradient(
             gradient: Gradient(colors: [lighterVariant, darkerVariant]),
@@ -84,16 +83,15 @@ extension View {
             endPoint: .bottomTrailing
         )
         
-        // Ensure font color has good contrast with button background
-        let buttonFontColor = themeFontColor
         
         return self.modifier(
             GameButtonModifier(
                 gradient: gradient,
-                maxHeight: uiSize.maxHeight,
-                minWidth: uiSize.minWidth,
+                maxHeight: maxHeight > 0 ? maxHeight : uiSize.maxHeight,
+                minWidth: minWidth > 0 ? minWidth : uiSize.minWidth,
+                maxWidth: maxWidth,
                 fontSize: uiSize.fontSize,
-                fontColor: buttonFontColor
+                fontColor: themeFontColor
             )
         )
     }
@@ -131,6 +129,7 @@ extension View {
                 gradient: gradient,
                 maxHeight: uiSize.maxHeight,
                 minWidth: uiSize.minWidth,
+                maxWidth: uiSize.minWidth + 100,
                 fontSize: uiSize.fontSize,
                 fontColor: fontColor
             )
@@ -143,6 +142,7 @@ extension View {
                 gradient: gradient,
                 maxHeight: maxHeight,
                 minWidth: minWidth,
+                maxWidth: minWidth + 100,
                 fontSize: fontSize,
                 fontColor: fontColor
             )
