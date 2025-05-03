@@ -25,6 +25,7 @@ struct GameState: Codable, Equatable {
     var baseButtonColorGreen: Double
     var baseButtonColorBlue: Double
     var baseButtonColorOpacity: Double
+    var selectedTab: Int
 }
 
 struct Tile: Codable, Identifiable, Equatable {

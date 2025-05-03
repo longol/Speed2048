@@ -11,7 +11,10 @@ struct GameLevelPicker: View {
     @EnvironmentObject var gameManager: GameManager
     
     var body: some View {
-        HStack {
+        HStack(alignment: .center) {
+            
+            Spacer()
+            
             Picker(selection: $gameManager.gameLevel) {
                 ForEach(GameLevel.allCases, id: \.self) { level in
                     Text(level.description).tag(level)
@@ -25,6 +28,7 @@ struct GameLevelPicker: View {
 #else
             .pickerStyle(PalettePickerStyle())
 #endif
+            Spacer()
         }
     }
 }
