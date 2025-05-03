@@ -30,5 +30,6 @@ struct GameLevelPicker: View {
 #endif
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ScoreUnitView: View {
+    @EnvironmentObject var gameManager: GameManager
     
     var text: String
     var icon: String
@@ -17,11 +18,12 @@ struct ScoreUnitView: View {
         HStack {
             Image(systemName: icon)
                 .font(.system(size: 18, weight: .bold))
+                
             Text(value)
                 .font(.system(size: 18, weight: .regular))
         }
         .minimumScaleFactor(0.5)
-        .lineLimit(1)             
-
+        .lineLimit(1)
+        .foregroundStyle(gameManager.fontColor)
     }
 }

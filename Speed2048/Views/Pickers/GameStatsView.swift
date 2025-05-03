@@ -18,11 +18,14 @@ struct GameStatsView: View {
     var body: some View {
         HStack(alignment: .center) {
             Spacer()
-            LazyVGrid(columns: columns, spacing: 10) {
+            Text("Stats")
+                .bold()
+            LazyVGrid(columns: columns) {
                 ScoreUnitView(text: "Time", icon: "clock", value: gameManager.seconds.formattedAsTime)
                 ScoreUnitView(text: "Sum", icon: "sum", value: gameManager.totalScore.formatted())
             }
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
     }
 }

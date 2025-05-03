@@ -15,13 +15,15 @@ struct ColorPickerFonts: View {
             
             Spacer()
             
-            ColorPicker(selection: $gameManager.backgroundColor) {
-                Label("Background", systemImage: "person.and.background.striped.horizontal")
-                    .foregroundStyle(gameManager.fontColor)
+            ColorPicker(selection: $gameManager.fontColor) {
+                Label("Font Colors", systemImage: "button.programmable")
+                    .bold()
             }
             
             Spacer()
             
         }
+        .foregroundStyle(gameManager.fontColor)
+        
     }
 }

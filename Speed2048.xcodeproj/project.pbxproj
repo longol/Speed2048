@@ -25,23 +25,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A83BB10E2DBED5D6006E4527 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Game/GameManager.swift,
-				Utilities/DataManager.swift,
-				Utilities/Extensions.swift,
-				Utilities/ViewModifiers.swift,
-				Views/AnimationSpeedToggle.swift,
-				Views/BoardSizePicker.swift,
-				Views/ColorPickerView.swift,
-				Views/ColorThemePresets.swift,
-				Views/GameLevelPicker.swift,
-				Views/TileColorPreviewView.swift,
-				Views/TileView.swift,
-			);
-			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
-		};
 		A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
@@ -49,13 +32,45 @@
 			};
 			target = A85FA9322D9CE3A800959E76 /* Speed2048 */;
 		};
+		A898834C2DC6C051007F5A0E /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Views/Game Views/ContentSliderView.swift",
+				"Views/Game Views/GameBoardView.swift",
+				"Views/Game Views/GameButtonsView.swift",
+				"Views/Game Views/OverlayMessageView.swift",
+				"Views/Game Views/TileView.swift",
+				Views/Pickers/AnimationSpeedToggle.swift,
+				Views/Pickers/BoardSizePicker.swift,
+				Views/Pickers/ColorPickerBackground.swift,
+				Views/Pickers/ColorPickerButtons.swift,
+				Views/Pickers/ColorPickerFonts.swift,
+				Views/Pickers/GameCheatsView.swift,
+				Views/Pickers/GameLevelPicker.swift,
+				Views/Pickers/GameStatsView.swift,
+				Views/Pickers/ScoreUnitView.swift,
+				"Views/Settings Views/ColorThemePresets.swift",
+				"Views/Settings Views/TileColorPreviewView.swift",
+			);
+			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
+		};
+		A898835B2DC6C566007F5A0E /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Game/GameManager.swift,
+				Utilities/DataManager.swift,
+				Utilities/Extensions.swift,
+				Utilities/ViewModifiers.swift,
+			);
+			target = A8C37A2E2DA5D35100A76CCD /* Speed2048Watch Watch App */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A83BB0F82DBED5D6006E4527 /* SharedCode */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A83BB10E2DBED5D6006E4527 /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */,
+				A898835B2DC6C566007F5A0E /* Exceptions for "SharedCode" folder in "Speed2048Watch Watch App" target */,
 			);
 			path = SharedCode;
 			sourceTree = "<group>";
@@ -64,6 +79,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A8551C7E2DA19F9E00D96AAD /* Exceptions for "Speed2048" folder in "Speed2048" target */,
+				A898834C2DC6C051007F5A0E /* Exceptions for "Speed2048" folder in "Speed2048Watch Watch App" target */,
 			);
 			path = Speed2048;
 			sourceTree = "<group>";

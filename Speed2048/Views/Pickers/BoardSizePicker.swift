@@ -14,7 +14,7 @@ struct BoardSizePicker: View {
         HStack(alignment: .center) {
             Spacer()
 
-            Label("\(gameManager.boardSize)x\(gameManager.boardSize)", systemImage: "square.grid.3x3")
+            Label("Board size \(gameManager.boardSize)x\(gameManager.boardSize)", systemImage: "square.grid.3x3")
                 .bold()
                     
             Stepper("",
@@ -25,5 +25,6 @@ struct BoardSizePicker: View {
 
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
     }
 }

@@ -17,7 +17,7 @@ struct ColorThemePresets: View {
                 .padding(.bottom, 4)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(alignment: .top) {
                     ForEach(ColorThemes.allCases, id: \.self) { theme in
                         ThemeButton(
                             name: theme.rawValue,
@@ -32,8 +32,6 @@ struct ColorThemePresets: View {
                             gameManager.selectedThemeName = theme.rawValue
                             gameManager.baseButtonColor = theme.buttonBaseColor
                         }
-                        
-                        
                     }
                 }
                 .padding(.vertical, 4)
@@ -57,7 +55,7 @@ struct ThemeButton: View {
     let isSelected: Bool
 
     var body: some View {
-        VStack {
+        VStack(alignment: .center) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(background)

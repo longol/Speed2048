@@ -20,6 +20,7 @@ struct AnimationSpeedToggle: View {
             .padding(.horizontal, 5)
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
     }
 }
 

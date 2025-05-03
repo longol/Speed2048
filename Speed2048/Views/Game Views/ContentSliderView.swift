@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ContentSliderView: View {
     @EnvironmentObject var gameManager: GameManager
+    
     let numViews: Int = 8
+    let maxHeight: CGFloat = 40
     
     var body: some View {
         VStack {
@@ -31,6 +33,8 @@ struct ContentSliderView: View {
                             GameCheatsView()
                         }
                         .frame(width: geo.size.width)
+                        .frame(maxHeight: maxHeight)
+                        .contentShape(Rectangle())
                     }
                     .offset(x: -CGFloat(gameManager.selectedTab) * geo.size.width)
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: gameManager.selectedTab)
@@ -49,10 +53,12 @@ struct ContentSliderView: View {
                             }
                     )
                 }
+                .frame(height: maxHeight)
                 .clipped()
                 
                 rightIndexButton
             }
+            .frame(height: maxHeight)
             
             pageIndicatorsView
                 .padding()

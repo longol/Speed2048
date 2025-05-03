@@ -15,12 +15,14 @@ struct ColorPickerBackground: View {
      
             Spacer()
 
-            ColorPicker(selection: $gameManager.baseButtonColor) {
-                Label("Buttons", systemImage: "button.programmable")
-                    .foregroundStyle(gameManager.fontColor)
+            ColorPicker(selection: $gameManager.backgroundColor) {
+                Label("Background Colors", systemImage: "person.and.background.striped.horizontal")
+                    .bold()
             }
             
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
+        
     }
 }

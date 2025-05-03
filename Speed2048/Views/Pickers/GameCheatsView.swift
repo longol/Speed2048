@@ -17,9 +17,13 @@ struct GameCheatsView: View {
     ]
     
     var body: some View {
+        
         HStack(alignment: .center)  {
             
             Spacer()
+            Text("Cheats")
+                .bold()
+                
             LazyVGrid(columns: columns, spacing: 10) {
                 ScoreUnitView(text:"Undos", icon: "arrow.uturn.backward.circle", value: gameManager.undosUsed.formatted())
                 ScoreUnitView(text:"+4s", icon: "4.circle", value: gameManager.manual4sUsed.formatted())
@@ -28,5 +32,7 @@ struct GameCheatsView: View {
             
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
+        
     }
 }

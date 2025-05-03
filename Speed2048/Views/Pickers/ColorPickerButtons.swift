@@ -15,12 +15,14 @@ struct ColorPickerButtons: View {
             
             Spacer()
             
-            ColorPicker(selection: $gameManager.fontColor) {
-                Label("Fonts", systemImage: "character.circle.fill")
-                    .foregroundStyle(gameManager.fontColor)
+            ColorPicker(selection: $gameManager.baseButtonColor) {
+                Label("Button Colors", systemImage: "character.circle.fill")
+                    .bold()
             }
             
             Spacer()
         }
+        .foregroundStyle(gameManager.fontColor)
+        
     }
 }

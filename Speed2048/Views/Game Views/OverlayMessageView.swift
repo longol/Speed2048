@@ -10,11 +10,16 @@ import SwiftUI
 struct OverlayMessageView: View {
     @EnvironmentObject var gameManager: GameManager
     
+    let frameHeight: CGFloat = 60
+    
     var body: some View {
         VStack(alignment: .center) {
             if gameManager.showOverlayMessage {
                 Text(gameManager.overlayMessage)
-                    .foregroundStyle(.black)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(3)
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -22,12 +27,14 @@ struct OverlayMessageView: View {
                             .shadow(radius: 5)
                     )
                     .transition(.scale.combined(with: .opacity))
+
             } else {
                 EmptyView()
             }
         }
-        .frame(height: 50)
-        .padding(.vertical, 10)
+        .frame(height: frameHeight)
+        .padding()
+        .foregroundStyle(gameManager.fontColor)
 
     }
 }
